@@ -1,24 +1,24 @@
 # SwiftPage
 
-##What is SwiftPage?
+### What is SwiftPage?
 
 
 
-##What can I use SwiftPage for?
+What can I use SwiftPage for?
 
 
 
-##What are some SwiftPage examples?
+What are some SwiftPage examples?
 
 
 
-##How do I set up SwiftPage and what are its dependencies?
+How do I set up SwiftPage and what are its dependencies?
 
 
 
-##How do I use SwiftPage?
+How do I use SwiftPage?
 
 
 
-##How can I customize my SwiftPages?
+How can I customize my SwiftPages?
 
