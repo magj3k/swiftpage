@@ -100,12 +100,33 @@ class Page(object):
                 issues.append("The page's last Component should be a 'footer' Row.")
 
             navbar_exists = False
+            filesrow_exists = False
+            peoplerow_exists = False
+            empty_link_exists = False
             for section in self.sections:
                 if isinstance(section, NavBar):
                     navbar_exists = True
+                elif isinstance(section, Section):
+                    for row in section.rows:
+                        if row.type == "files":
+                            filesrow_exists = True
+                        elif row.type == "people":
+                            peoplerow_exists = True
+                        elif row.type == "links":
+                            if "links" in row.metadata:
+                                links = row.metadata["links"]
+                                for link in links:
+                                    if "address" not in link or link["address"] == "":
+                                        empty_link_exists = True
 
             if navbar_exists == False:
                 issues.append("Consider adding a 'NavBar' to make navigation easier for viewers.")
+            if empty_link_exists == True:
+                issues.append("Make sure all links have a specified 'address'.  Empty links may cause rendering abnormalities.")
+            if filesrow_exists == True and not os.path.isfile("site/images/document_icon.png"):
+                issues.append("To use 'files' Rows, you need to have a square image named 'document_icon.png' in 'site/images'.")
+            if peoplerow_exists == True and not os.path.isfile("site/images/unknown.png"):
+                issues.append("To use 'people' Rows, you need to have a square image named 'unknown.png' in 'site/images'.")
 
         if len(issues) == 0:
             print("No issues found, SwiftPage design is complete")
@@ -141,6 +162,8 @@ class Page(object):
             os.makedirs("site/files")
         if not os.path.exists("site/images"):
             os.makedirs("site/images")
+
+
 
         f = open("site/"+self.filename, "w")
         f.write(self.render())
@@ -216,9 +239,9 @@ class Section(object):
         self.name = name
         self.subtitle = subtitle
         self.filename = filename
-        self.primary_color = "#ffffff"
+        self.primary_color = primary_color
         if primary_color == "": self.primary_color = pick_representative_color("site/images/"+str(filename)+"_icon.png", "large")
-        self.secondary_color = "cdcdcd"
+        self.secondary_color = secondary_color
         if secondary_color == "": self.secondary_color = dim_hex(self.primary_color)
 
         # constructs row objects for section
@@ -279,11 +302,26 @@ class Row(object):
 
     def render(self):
         if self.type == "header":
-            return "<a name='"+self.metadata["filename"]+"'><div class='row' style='background-color: "+self.color+"; text-align: left'><!-- content row -->\n<div class='rowicon'><img src='"+self.metadata["icon_path"]+"' height='100%'></div>\n<div class='rowheader'>"+self.metadata["name"]+"</div>\n<div class='rowsubtitle'>"+self.metadata["subtitle"]+"</div>\n</div></a>\n"
+            div_style = "background-color: "+self.color+"; text-align: left"
+            return "<a name='"+self.metadata["filename"]+"'><div class='row' style='"+div_style+"'><!-- content row -->\n<div class='rowicon'><img src='"+self.metadata["icon_path"]+"' height='100%'></div>\n<div class='rowheader'>"+self.metadata["name"]+"</div>\n<div class='rowsubtitle'>"+self.metadata["subtitle"]+"</div>\n</div></a>\n"
         elif self.type == "title":
             return "<div class='row' id='thinrow' style='background-color: "+self.color+"'><div class='vertical-center'>\n"+self.metadata["name"]+"\n</div></div>\n"
         elif self.type == "logo":
-            prefix = "<div class='row' id='logorow' style='background-color: "+self.color+";'><!-- logo -->\n<div class='vertical-center'>"
+            style = "background-color: "+self.color+";"
+
+            # background color
+            if "background-colors" in self.metadata:
+                colors = self.metadata["background-colors"]
+                if len(colors) == 1: # new background color
+                    style = "background-color: "+colors[0]+";"
+                elif len(colors) > 1: # background gradient
+                    style = "background-image: linear-gradient(to right, "+colors[0]+", "+colors[-1]+");"
+
+            if "background-filename" in self.metadata: # background image
+                if os.path.isfile("site/images/"+self.metadata["background-filename"]):
+                    style = "background-color: "+self.color+"; background-image: url('images/"+self.metadata["background-filename"]+"');"
+
+            prefix = "<div class='row' id='logorow' style='"+style+"'><!-- logo -->\n<div class='vertical-center'>"
             suffix = "</div>\n</div>\n"
 
             rendered_row = prefix
@@ -347,7 +385,16 @@ class Row(object):
             if footer_content == "":
                 footer_content = "<font color='"+text_color+"'>Website created with <a href='https://github.com/magj3k/swiftpage' target='_blank' style='color: "+text_color+"; display: auto; width: auto; height: auto;'>SwiftPage</a> (available on GitHub).<br>SwiftPage is an open-source project created and maintained by <a href='http://www.magmhj.com' target='_blank' style='color: "+text_color+"; display: auto; width: auto; height: auto;'>MagMHJ, LLC</a>.</font>"
 
-            return "<div class='row' id='footer' style='background-color: "+self.color+"'><!-- footer -->\n<div class='vertical-center'>"+footer_content+"</div>\n</div>\n"
+            # background color
+            style = "background-color: "+self.color+";"
+            if "background-colors" in self.metadata:
+                colors = self.metadata["background-colors"]
+                if len(colors) == 1: # new background color
+                    style = "background-color: "+colors[0]+";"
+                elif len(colors) > 1: # background gradient
+                    style = "background-image: linear-gradient(to right, "+colors[0]+", "+colors[-1]+");"
+
+            return "<div class='row' id='footer' style='"+style+"'><!-- footer -->\n<div class='vertical-center'>"+footer_content+"</div>\n</div>\n"
         elif self.type == "img_gallery":
             prefix = "<div class='row' id='bigbigrow' style='background-color: "+self.color+"'><div class='slideshow'>\n<table border='0' height='420'><tr>\n"
             suffix = "</tr></table>\n</div></div>\n"

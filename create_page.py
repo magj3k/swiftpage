@@ -3,15 +3,33 @@ from elements import *
 output_file = "index.html"
 page_title = "SwiftPage Test Website"
 
+# modify the 'page' object below to design your own SwiftPage
 page = Page([
     Row("logo", {
         "text": "Rocky Road",
+        "text-color": "#ffffff",
+        "rounded": "true",
+        "rounded-border-color": "#ccccff",
+        "background-colors": ["#000000", "#5b8d37"],
+        "filename": "rockyroad2_icon.png"
     }),
     NavBar({
         "soundcloud": {"address": "#"},
         "facebook": {"address": "#"},
         "linkedin": {"address": "#"}
     }),
+    Section("mobileML", "Some dumb app", "mobileml", [
+        {
+            "type": "img_gallery",
+            "name": "Imgs:",
+        }
+    ]),
+    Section("Planemo", "Some dumb app", "planemo", [
+        {
+            "type": "img_gallery",
+            "name": "Imgs:",
+        }
+    ], "#183552"),
     Section("Rocky Road 2", "An app project I made once", "rockyroad2", [
         {
             "name": "Test Links:",
@@ -38,7 +56,7 @@ page = Page([
             "type": "people",
             "people": [
                 {"name": "Magnus Johnson", "filename": "magnus.png"},
-                {"name": "Rando Calrissian"}
+                {"name": "Rando C."}
             ]
         },
         {
@@ -52,5 +70,5 @@ page = Page([
     Row("footer", {}),
 ], output_file, page_title)
 
-page.check()
-page.write()
+page.check() # prints relevant design warnings and tips
+page.write() # saves webpage to specified destination
