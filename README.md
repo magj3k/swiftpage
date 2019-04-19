@@ -24,5 +24,5 @@
 
 
 
-How can I customize my SwiftPages?
+### How can I customize my SwiftPages?
 

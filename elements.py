@@ -163,8 +163,6 @@ class Page(object):
         if not os.path.exists("site/images"):
             os.makedirs("site/images")
 
-
-
         f = open("site/"+self.filename, "w")
         f.write(self.render())
         f.close()
@@ -174,7 +172,7 @@ class NavBar(object):
         self.links = links
 
     def calculate_link_color(self, image_address):
-        im = get_img_and_resize(image_address).convert('HSV')
+        im = get_img_and_resize(image_address, 'small').convert('HSV')
 
         # calculates average color along border of hsv image
         width = im.size[0]
@@ -220,12 +218,12 @@ class NavBar(object):
                 else:
                     rendered_bar += "<a href='"+link_address+"' target='_blank'><div class='link'>\n"
 
-            if os.path.isfile("site/images/"+link_name+"_icon.png"):
-                if link_color == "": link_color = self.calculate_link_color("site/images/"+link_name+"_icon.png")
-                rendered_bar += "<div class='column' style='background-color: "+link_color+"'><div class='vertical-center'><div class='icon'><img src='images/"+link_name+"_icon.png' width='100%'></div></div></div>\n"
-            elif os.path.isfile("site/images/nav_"+link_name+".png"):
+            if os.path.isfile("site/images/nav_"+link_name+".png"):
                 if link_color == "": link_color = self.calculate_link_color("site/images/nav_"+link_name+".png")
                 rendered_bar += "<div class='column' style='background-color: "+link_color+"'><div class='vertical-center'><div class='icon'><img src='images/nav_"+link_name+".png' width='100%'></div></div></div>\n"
+            elif os.path.isfile("site/images/"+link_name+"_icon.png"):
+                if link_color == "": link_color = self.calculate_link_color("site/images/"+link_name+"_icon.png")
+                rendered_bar += "<div class='column' style='background-color: "+link_color+"'><div class='vertical-center'><div class='icon'><img src='images/"+link_name+"_icon.png' width='100%'></div></div></div>\n"
 
             if link_address != None and link_address != "":
                 rendered_bar += "</div></a>\n"
