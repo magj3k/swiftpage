@@ -485,7 +485,7 @@ class Row(object):
             return rendered_row
         elif self.type == "custom":
             row_type = "bigrow"
-            if "size" in self.metadata[] and (self.metadata["size"] == "big" or self.metadata["size"] == "large"):
+            if "size" in self.metadata and (self.metadata["size"] == "big" or self.metadata["size"] == "large"):
                 row_type = "bigbigrow"
             prefix = "<div class='row' id='"+row_type+"'"
 
