@@ -66,7 +66,7 @@ To customize your SwiftPage, change the rendered `Page` object in `create_page.p
 
 Rows have lots of different capabilities, but they are the smallest singular units of information that SwiftPage parses and renders.  When constructing a new Row, its **first parameter** is a string that defines the Row's **type**, which determines what additional information it requires.  Its **second parameter** is a dictionary of **relevant metadata** about the Row that is specific for the Row's type.
 
-Here is a list of currently-supported Row types and the parameters they adhere to:
+Here is a list of currently-supported standalone Row types and the parameters they adhere to:
 
 ##### Type: Logo - "logo"
 
@@ -95,7 +95,7 @@ Row("logo", {
 
 Appearance:
 
-
+![row_header](readme_resources/row_header.png)
 
 ##### Type: Footer - "footer"
 
@@ -119,8 +119,10 @@ Appearance:
 
 
 
-#### NavBars
-
-
+All other Row types are not intended for standalone use – they are created and managed by Section objects, which are explained further in the section below.
 
 #### Sections
+
+
+
+#### NavBars
