@@ -68,6 +68,8 @@ Rows have lots of different capabilities, but they are the smallest singular uni
 
 Here is a list of currently-supported standalone Row types and the parameters they adhere to:
 
+
+
 ##### Type: Logo - "logo"
 
 Metadata parameters:
@@ -97,6 +99,8 @@ Appearance:
 
 ![row_header](readme_resources/row_header.png)
 
+
+
 ##### Type: Footer - "footer"
 
 Metadata parameters:
@@ -117,6 +121,8 @@ Row("footer", {
 
 Appearance:
 
+![row_header](readme_resources/row_footer.png)
+
 
 
 All other Row types are not intended for standalone use – they are created and managed by Section objects, which are explained further in the section below.
@@ -126,3 +132,4 @@ All other Row types are not intended for standalone use – they are created and
 
 
 #### NavBars
+
