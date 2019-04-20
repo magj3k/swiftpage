@@ -6,7 +6,7 @@ SwiftPage is a series of Python scripts that let you generate good-looking websi
 
 ### What can I use SwiftPage for?
 
-Need a quick and dirty webpage that doesnt look like crap?  SwiftPage will help you transform your one-off webpages from this:
+Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help you transform your one-off webpages from this:
 
 
 
@@ -54,7 +54,73 @@ Running `python create_page.py` will look at the specified page, print warnings 
 
 Running `python server.py`, on the other hand, will start a server that will detect when `create_page.py` has been changed and automatically regenerate the SwiftPage inside the `site/` directory.  Therefore, with `server.py` running, you can edit `create_page.py` like an HTML file and refresh your browser to see changes.
 
+SwiftPage works by generating code that fits to the preexisting contents of the `site/` directory.  The idea is that you can drag any relevant images and files into the `site/` directory, then run `create_page.py` or `server.py` to automatically generate code that points to everything correctly so you don't have to worry about file paths and heirarchies!
+
 **TL/DR:** `python create_page.py` generates your page *once*, `python server.py` generates your page whenever `create_page.py` changes.
 
 ### How can I customize my SwiftPages?
 
+To customize your SwiftPage, change the rendered `Page` object in `create_page.py`.  `Page` objects can be created with a specified list of Components, like Rows, NavBars, and Sections.  Each of these Components has certain parameters which affect its appearance and behavior as follows:
+
+#### Rows
+
+Rows have lots of different capabilities, but they are the smallest singular units of information that SwiftPage parses and renders.  When constructing a new Row, its **first parameter** is a string that defines the Row's **type**, which determines what additional information it requires.  Its **second parameter** is a dictionary of **relevant metadata** about the Row that is specific for the Row's type.
+
+Here is a list of currently-supported Row types and the parameters they adhere to:
+
+##### Type: Logo - "logo"
+
+Metadata parameters:
+
+- "filename": String, optional, name of logo image file within `images` directory
+- "height": Integer, optional, changes the height of the logo image if "filename" is defined
+- "text": String, optional, logo text, can be rendered when "filename" is defined or undefined
+- "text-color": String hex code, optional, changes color of text when "text" is defined
+- "rounded": String "true" or "false", optional, defines whether or not text is surrounded by rounded background
+- "rounded-color": String hex code, optional, changes color of rounded background if "rounded" is "true"
+- "rounded-border-color": String hex code, optional, changes color of rounded background border
+- "background-colors": list of String hex codes, optional, changes background color to gradient between the first and last provided colors
+- "background-filename": String, optional, name of background image file within `images` directory
+- "snippet": String, optional, HTML snippet of code that is rendered if "filename" and "text" are both not defined
+
+Example construction:
+
+```
+Row("logo", {
+    "text": "My Projects SwiftPage",
+    "rounded": "true",
+    "background-colors": ["#f06d55", "#1a32d5"],
+})
+```
+
+Appearance:
+
+
+
+##### Type: Footer - "footer"
+
+Metadata parameters:
+
+- "snippet": String, optional, HTML snippet of code
+- "text": String, optional, text that is rendered when "snippet" is not defined
+- "text-color": String hex code, optional, changes color of text
+- "background-colors": list of String hex codes, optional, changes background color to gradient between the first and last provided colors
+
+Example construction:
+
+```
+Row("footer", {
+    "text": "All Rights Reserved.",
+    "text-color": "#242424",
+})
+```
+
+Appearance:
+
+
+
+#### NavBars
+
+
+
+#### Sections
