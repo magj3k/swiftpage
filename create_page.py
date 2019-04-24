@@ -1,4 +1,5 @@
 from elements import *
+from addons import *
 
 page_title = "SwiftPage Demo"
 
@@ -44,6 +45,9 @@ page = Page([
     ]),
     Row("footer", {}),
 ], "index.html", page_title)
+
+# modifies page through addons
+page = AddonsModifier(page).generate()
 
 page.check() # prints relevant design warnings and tips
 page.write() # saves webpage to specified destination
