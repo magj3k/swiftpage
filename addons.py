@@ -1,7 +1,8 @@
 import os
 
 # import custom addons here
-# import addons._
+# from addons._ import *
+from addons_dir.speech_control import *
 
 class AddonsModifier(object): # loads saved modifications and applies them to current page
     def __init__(self, page):
@@ -20,12 +21,18 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
 class AddonsServer(object): # saves modifications to file
     def __init__(self, page):
         self.page = page
-        self.addons = []
+        self.addons = [
+            SpeechControlAddon(page)
+        ]
 
         self.modifications_string = ""
         if os.path.isfile(".modifications"):
             f = open(".modifications", "r")
             self.modifications_string = f.read()
+
+        # starts all addons
+        for addon in self.addons:
+            addon.start()
 
     def on_update(self):
         mods_to_add = ""
@@ -38,22 +45,5 @@ class AddonsServer(object): # saves modifications to file
             self.modifications_string = self.modifications_string + "\n" + mods_to_add
             mod_file = open(".modifications","w") 
             mod_file.write(self.modifications_string)
-            mod_file.close() 
-
-class Addon(object): # can be subclassed to create custom addons
-    def __init__(self, page):
-        self.page = page
-        self.queued_modifications = []
-
-    def get_modifications(self): # each modification should be a string
-        modification_string = ""
-        for i in range(len(self.queued_modifications)):
-            mod = self.queued_modifications[i]
-            if i == 0:
-                modification_string =  modification_string + mod
-            else:
-                modification_string =  modification_string + "\n" + mod
-
-        self.queued_modifications = []
-        return modification_string
+            mod_file.close()
 
