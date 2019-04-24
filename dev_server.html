@@ -11,7 +11,7 @@
                 var lines = data.match(/^.*((\r\n|\n|\r)|$)/gm)
                 for (var i = 0; i < lines.length; i++) {
                     if (lines[i] === 'refresh') {
-                        location.reload(true);
+                        location.reload(false);
                     }
                 }
             } else {

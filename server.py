@@ -23,7 +23,7 @@ dev_page_middle = '\\'+'r'+'\\'+'n'+'|'+'\\'+'n'+'|'+'\\'+'r'
 dev_page_suffix = ''')|$)/gm)
                 for (var i = 0; i < lines.length; i++) {
                     if (lines[i] === 'refresh') {
-                        location.reload(true);
+                        location.reload(false);
                     }
                 }
             } else {
@@ -49,30 +49,30 @@ dev_page_suffix = ''')|$)/gm)
 dev_page = dev_page_prefix+dev_page_middle+dev_page_suffix
 
 def main_loop():
-    global last_modified_time
+    while True:
+        global last_modified_time
 
-    # checks to see if files have been updated
-    modified_time = os.path.getmtime("create_page.py")
+        # checks to see if files have been updated
+        modified_time = os.path.getmtime("create_page.py")
 
-    # if necessary, saves new copy of swiftpage
-    if last_modified_time != modified_time:
-        last_modified_time = modified_time
+        # if necessary, saves new copy of swiftpage
+        if last_modified_time != modified_time:
+            last_modified_time = modified_time
 
-        os.system('python create_page.py')
-        print("Page modified, new SwiftPage generated: "+str(last_modified_time))
+            os.system('python create_page.py')
+            print("Page modified, new SwiftPage generated: "+str(last_modified_time))
 
-        # refreshes web browser and writes other commands
-        commands = open(".swiftpage_commands","w") 
-        commands.write("refresh")
-        commands.close() 
-    else:
-        # empties commands
-        commands = open(".swiftpage_commands","w") 
-        commands.write("")
-        commands.close() 
+            # refreshes web browser and writes other commands
+            commands = open(".swiftpage_commands","w") 
+            commands.write("refresh")
+            commands.close() 
+        else:
+            # empties commands
+            commands = open(".swiftpage_commands","w") 
+            commands.write("")
+            commands.close() 
 
-    time.sleep(0.25)
-    main_loop()
+        time.sleep(0.25)
 
 # creates dev_server.html
 dev_server_page = open("dev_server.html","w") 
