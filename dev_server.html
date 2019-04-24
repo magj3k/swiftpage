@@ -11,7 +11,9 @@
                 var lines = data.match(/^.*((\r\n|\n|\r)|$)/gm)
                 for (var i = 0; i < lines.length; i++) {
                     if (lines[i] === 'refresh') {
-                        location.reload(false);
+                        // location.reload(false);
+                        var iframe = document.getElementsByName('content_window')[0];
+                        iframe.contentWindow.location.reload(true);
                     }
                 }
             } else {
@@ -29,7 +31,7 @@
 </script>
 
 <body style='padding: 0px; margin: 0px;'>
-<iframe src='./site/index.html' style='width: 100%; height: 100%; outline: none;' frameborder='0'></iframe>
+<iframe src='./site/index.html' name='content_window' style='width: 100%; height: 100%; outline: none;' frameborder='0'></iframe>
 </body>
 
 </html>
