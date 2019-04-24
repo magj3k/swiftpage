@@ -52,7 +52,7 @@ The file `create_page.py` is where you define the content of your SwiftPage.  In
 
 Running `python create_page.py` will look at the specified page, print warnings about potentially problematic design choices, and save a new HTML5 SwiftPage inside the `site/` directory *once*.
 
-Running `python server.py`, on the other hand, will start a server that will detect when `create_page.py` has been changed and automatically regenerate the SwiftPage inside the `site/` directory.  Therefore, with `server.py` running, you can edit `create_page.py` like an HTML file and refresh your browser to see changes.
+Running `python server.py`, on the other hand, will start a server that will detect when `create_page.py` has been changed, automatically regenerate the SwiftPage inside the `site/` directory, and refresh `dev.html` in your default web browser.  Therefore, with `server.py` running, you can edit `create_page.py` like an HTML file and see your changes automatically update in your web browser.
 
 SwiftPage works by generating code that fits to the preexisting contents of the `site/` directory.  The idea is that you can drag any relevant images and files into the `site/` directory, then run `create_page.py` or `server.py` to automatically generate code that points to everything correctly so you don't have to worry about file paths and heirarchies!
 
