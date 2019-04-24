@@ -8,7 +8,7 @@ import socketserver
 
 last_modified_time = 0
 
-dev_page = '''
+dev_page_prefix = '''
 <html>
 
 <title>SwiftPage Development Server</title>
@@ -18,7 +18,9 @@ dev_page = '''
     function loadCommands(filename) {
         $.get(filename, function(data, textStatus) {
             if (textStatus == 'success') {
-                var lines = data.match(/^.*((\r\n|\n|\r)|$)/gm)
+                var lines = data.match(/^.*(('''
+dev_page_middle = '\\'+'r'+'\\'+'n'+'|'+'\\'+'n'+'|'+'\\'+'r'
+dev_page_suffix = ''')|$)/gm)
                 for (var i = 0; i < lines.length; i++) {
                     if (lines[i] === 'refresh') {
                         location.reload(true);
@@ -39,11 +41,12 @@ dev_page = '''
 </script>
 
 <body style='padding: 0px; margin: 0px;'>
-<iframe src='./site/index.html' style='width: 100%; height: 100%'></iframe>
+<iframe src='./site/index.html' style='width: 100%; height: 100%; outline: none;' frameborder='0'></iframe>
 </body>
 
 </html>
 '''
+dev_page = dev_page_prefix+dev_page_middle+dev_page_suffix
 
 def main_loop():
     global last_modified_time

@@ -1,0 +1,35 @@
+
+<html>
+
+<title>SwiftPage Development Server</title>
+
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<script>
+    function loadCommands(filename) {
+        $.get(filename, function(data, textStatus) {
+            if (textStatus == 'success') {
+                var lines = data.match(/^.*((\r\n|\n|\r)|$)/gm)
+                for (var i = 0; i < lines.length; i++) {
+                    if (lines[i] === 'refresh') {
+                        location.reload(true);
+                    }
+                }
+            } else {
+                console.log('Commands file does not exist.');
+            }
+        });
+    }
+
+    function checkForCommands() {
+        var filename = '.swiftpage_commands';
+        loadCommands(filename);
+    }
+
+    setInterval(checkForCommands, 250);
+</script>
+
+<body style='padding: 0px; margin: 0px;'>
+<iframe src='./site/index.html' style='width: 100%; height: 100%; outline: none;' frameborder='0'></iframe>
+</body>
+
+</html>
