@@ -1,6 +1,5 @@
 from elements import *
 
-output_file = "index.html"
 page_title = "SwiftPage Demo"
 
 # modify the 'page' object below to design your own SwiftPage
@@ -44,7 +43,7 @@ page = Page([
         }
     ]),
     Row("footer", {}),
-], output_file, page_title)
+], "index.html", page_title)
 
 page.check() # prints relevant design warnings and tips
 page.write() # saves webpage to specified destination

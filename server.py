@@ -8,6 +8,43 @@ import socketserver
 
 last_modified_time = 0
 
+dev_page = '''
+<html>
+
+<title>SwiftPage Development Server</title>
+
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+<script>
+    function loadCommands(filename) {
+        $.get(filename, function(data, textStatus) {
+            if (textStatus == 'success') {
+                var lines = data.match(/^.*((\r\n|\n|\r)|$)/gm)
+                for (var i = 0; i < lines.length; i++) {
+                    if (lines[i] === 'refresh') {
+                        location.reload(true);
+                    }
+                }
+            } else {
+                console.log('Commands file does not exist.');
+            }
+        });
+    }
+
+    function checkForCommands() {
+        var filename = '.swiftpage_commands';
+        loadCommands(filename);
+    }
+
+    setInterval(checkForCommands, 250);
+</script>
+
+<body style='padding: 0px; margin: 0px;'>
+<iframe src='./site/index.html' style='width: 100%; height: 100%'></iframe>
+</body>
+
+</html>
+'''
+
 def main_loop():
     global last_modified_time
 
@@ -34,18 +71,22 @@ def main_loop():
     time.sleep(0.25)
     main_loop()
 
+# creates dev_server.html
+dev_server_page = open("dev_server.html","w") 
+dev_server_page.write(dev_page)
+dev_server_page.close() 
+
 # starts web server
 port = 8080
 handler = http.server.SimpleHTTPRequestHandler
+t1 = threading.Thread(target=main_loop)
 with socketserver.TCPServer(("", port), handler) as httpd:
 
     # opens web browser of local server
-    filename = "dev.html" # TODO: generate dev.html and point to saved file from create_page.py
-    webbrowser.open('http://127.0.0.1:8080/'+filename, new=0, autoraise=True)
+    webbrowser.open('http://127.0.0.1:8080/dev_server.html', new=0, autoraise=True)
     print("SwiftPage server running, your site will now be automatically regenerated when changes are made")
  
     # starts main loop
-    t1 = threading.Thread(target=main_loop)
     t1.start()
 
     # serves html server
