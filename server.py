@@ -3,6 +3,7 @@ import time
 import webbrowser
 import threading
 from addons import *
+from page import *
 
 import http.server
 import socketserver
@@ -50,14 +51,14 @@ dev_page_suffix = ''')|$)/gm)
 </html>
 '''
 dev_page = dev_page_prefix+dev_page_middle+dev_page_suffix
-addons_server = AddonsServer("create_page.py")
+addons_server = AddonsServer(page)
 
 def main_loop():
     while True:
         global last_modified_time
 
         # checks to see if files have been updated
-        modified_time = os.path.getmtime("create_page.py")
+        modified_time = os.path.getmtime("page.py")
 
         # if necessary, saves new copy of swiftpage
         if last_modified_time != modified_time:
