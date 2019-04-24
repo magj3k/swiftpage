@@ -87,9 +87,14 @@ dev_server_page = open("dev_server.html","w")
 dev_server_page.write(dev_page)
 dev_server_page.close() 
 
+# defines custon HTTP handler
+class customHandler(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        return
+
 # starts web server
 port = 8080
-handler = http.server.SimpleHTTPRequestHandler
+handler = customHandler # http.server.SimpleHTTPRequestHandler
 t1 = threading.Thread(target=main_loop)
 t2 = threading.Thread(target=addons_loop)
 with socketserver.TCPServer(("", port), handler) as httpd:

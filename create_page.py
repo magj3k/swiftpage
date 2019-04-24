@@ -6,7 +6,7 @@ page_title = "SwiftPage Demo"
 # modify the 'page' object below to design your own SwiftPage
 page = Page([
     Row("logo", {
-        "text": "My Projects SwiftPage",
+        "text": "My SwiftPage",
         "rounded": "true",
         "background-colors": ["#f06d55", "#1a32d5"],
     }),
