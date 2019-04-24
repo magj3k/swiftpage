@@ -20,7 +20,7 @@ SwiftPage will let you easily generate a well-designed, aesthetically pleasing w
 
 Many tools already exist for creating websites without needing to know any coding language or technical procedure.  Many of these tools, however, still require users to learn a new user interface or spend lots of extra time trying to make something aesthetically pleasing.
 
-SwiftPage makes all of these issues pretty much trivial – SwiftPage lets you create content-rich webpages in *minutes* that look great *by default*.
+SwiftPage makes all of these issues pretty much trivial – SwiftPage lets you create content-rich webpages in *minutes* that look great *by default* (and they're mobile-friendly).
 
 ### What are some SwiftPage examples?
 
@@ -48,19 +48,19 @@ python create_page.py
 
 SwiftPage provides two scripts, `create_page.py` and `server.py` that you can run to generate a new HTML5 website in the `site/` directory.
 
-The file `create_page.py` is where you define the content of your SwiftPage.  In the `Page` constructor, you specify the Components that will be rendered on the page, which is explained in further detail in the section below.
+The file `page.py` is where you define the content of your SwiftPage.  In the `Page` constructor, you specify the Components that will be rendered on the page, which is explained in further detail in the section below.
 
-Running `python create_page.py` will look at the specified page, print warnings about potentially problematic design choices, and save a new HTML5 SwiftPage inside the `site/` directory *once*.
+Running `python create_page.py` will look at the specified page in `page.py`, print warnings about potentially problematic design choices, and save a new HTML5 SwiftPage inside the `site/` directory *once*.
 
-Running `python server.py`, on the other hand, will start a server that will detect when `create_page.py` has been changed, automatically regenerate the SwiftPage inside the `site/` directory, and refresh `dev.html` in your default web browser.  Therefore, with `server.py` running, you can edit `create_page.py` like an HTML file and see your changes automatically update in your web browser.
+Running `python server.py`, on the other hand, will start a server that will detect when `page.py` has been changed, automatically regenerate the SwiftPage inside the `site/` directory, and refresh `dev_server.html` in your default web browser.  Therefore, with `server.py` running, you can edit `page.py` like an HTML file and see your changes automatically update in your web browser.
 
 SwiftPage works by generating code that fits to the preexisting contents of the `site/` directory.  The idea is that you can drag any relevant images and files into the `site/` directory, then run `create_page.py` or `server.py` to automatically generate code that points to everything correctly so you don't have to worry about file paths and heirarchies!
 
-**TL/DR:** `python create_page.py` generates your page *once*, `python server.py` generates your page whenever `create_page.py` changes.
+**TL/DR:** `python create_page.py` generates your page *once*, `python server.py` generates your page whenever `page.py` changes.
 
 ### How can I customize my SwiftPages?
 
-To customize your SwiftPage, change the rendered `Page` object in `create_page.py`.  `Page` objects can be created with a specified list of Components, like Rows, NavBars, and Sections.  Each of these Components has certain parameters which affect its appearance and behavior as follows:
+To customize your SwiftPage, change the rendered `Page` object in `page.py`.  `Page` objects can be created with a specified list of Components, like Rows, NavBars, and Sections.  Each of these Components has certain parameters which affect its appearance and behavior as follows:
 
 #### Rows
 
@@ -128,6 +128,10 @@ Appearance:
 All other Row types are not intended for standalone use – they are created and managed by Section objects, which are explained further in the section below.
 
 #### Sections
+
+Sections essentially cluster related rows together.  For example, you could create a Section dedicated to a product, project, client, or service and all included Rows would share the same aesthetic theme.
+
+
 
 
 
