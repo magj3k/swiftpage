@@ -28,6 +28,14 @@ dev_page_suffix = ''')|$)/gm)
                         // location.reload(false);
                         var iframe = document.getElementsByName('content_window')[0];
                         iframe.contentWindow.location.reload(true);
+                    } else if (lines[i] === 'scroll_to_bottom') {
+                        console.log('scrolling to bottom');
+                        var iframe = document.getElementsByName('content_window')[0];
+                        iframe.contentWindow.scrollTo(0, 999999);
+                    } else if (lines[i] === 'scroll_to_top') {
+                        console.log('scrolling to top');
+                        var iframe = document.getElementsByName('content_window')[0];
+                        iframe.contentWindow.scrollTo(0, 0);
                     }
                 }
             } else {
@@ -56,20 +64,31 @@ addons_server = AddonsServer(page)
 def main_loop():
     while True:
         global last_modified_time
+        global addons_server
 
         # checks to see if files have been updated
         modified_time = os.path.getmtime("page.py")
 
+        # checks if addons have generated any server commands
+        addons_server.on_update()
+        addon_commands = addons_server.get_server_commands()
+
         # if necessary, saves new copy of swiftpage
-        if last_modified_time != modified_time:
-            last_modified_time = modified_time
+        if last_modified_time != modified_time or len(addon_commands) >= 1:
+            command = ""
+            if last_modified_time != modified_time:
+                last_modified_time = modified_time
+                command = "refresh"
+
+            for cmd in addon_commands:
+                command += "\n" + cmd
 
             os.system('python create_page.py')
             print("Page modified, new SwiftPage generated: "+str(last_modified_time))
 
             # refreshes web browser and writes other commands
             commands = open(".swiftpage_commands","w") 
-            commands.write("refresh")
+            commands.write(command)
             commands.close() 
         else:
             # empties commands
@@ -78,10 +97,6 @@ def main_loop():
             commands.close() 
 
         time.sleep(0.25)
-
-def addons_loop():
-    global addons_server
-    addons_server.on_update()
 
 # creates dev_server.html
 dev_server_page = open("dev_server.html","w") 
@@ -97,7 +112,6 @@ class customHandler(http.server.SimpleHTTPRequestHandler):
 port = 8080
 handler = customHandler # http.server.SimpleHTTPRequestHandler
 t1 = threading.Thread(target=main_loop)
-t2 = threading.Thread(target=addons_loop)
 with socketserver.TCPServer(("", port), handler) as httpd:
 
     # opens web browser of local server
@@ -106,7 +120,6 @@ with socketserver.TCPServer(("", port), handler) as httpd:
  
     # starts loops
     t1.start()
-    t2.start()
 
     # serves html server
     httpd.serve_forever()

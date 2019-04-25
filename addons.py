@@ -29,16 +29,25 @@ class AddonsServer(object): # saves modifications to file
         if os.path.isfile(".modifications"):
             f = open(".modifications", "r")
             self.modifications_string = f.read()
+        self.server_commands = []
 
         # starts all addons
         for addon in self.addons:
             addon.start()
+
+    def get_server_commands(self):
+        commands = self.server_commands[:]
+        self.server_commands = []
+        return commands
 
     def on_update(self):
         mods_to_add = ""
         for addon in self.addons:
             modifications_string = addon.get_modifications()
             mods_to_add = mods_to_add + "\n" + modifications_string
+            server_cmds = addon.get_server_commands()
+            if len(server_cmds) > 0:
+                self.server_commands.extend(server_cmds)
 
         if mods_to_add != "" and len(mods_to_add) > 3:
             # saves modifications to disk
