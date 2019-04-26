@@ -20,6 +20,7 @@
                         iframe.contentWindow.scrollTo(0, 999999);
                     } else if (lines[i] === 'scroll_to_top') {
                         console.log('scrolling to top');
+                        var iframe = document.getElementsByName('content_window')[0];
                         iframe.contentWindow.scrollTo(0, 0);
                     }
                 }
