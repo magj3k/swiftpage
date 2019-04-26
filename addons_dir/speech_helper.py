@@ -1,3 +1,4 @@
+
 import colorsys as cs
 from math import *
 
@@ -7,16 +8,17 @@ synonyms = [
     ["try", "do"],
     ["go","scroll", "jump", "show"],
     ["to", "at", "2"],
-    ["top", "begin", "beginning", "start", "upper", "start"],
+    ["top", "begin", "beginning", "start", "upper"],
     ["bottom", "floor", "end", "final"],
     ["title", "logo", "header", "beginning"],
     ["color", "shade"],
+    ["brightness", "shine", "white"],
     ["next", "after"],
     ["gradient", "shade", "colorshift", "transition"],
     ["like", "similar", "around"],
     ["and", "also"],
     ["set", "reset", "change", "alter", "modify", "switch", "turn"],
-    ["make", "force", "turn"],
+    ["make", "force"],
     ["say", "list", "read", "show"],
     ["reload", "refresh"],
     ["please", "welcome", "thanks", "thank"],

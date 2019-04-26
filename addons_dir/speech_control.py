@@ -2,19 +2,6 @@ from addons_dir.addon import *
 from addons_dir.speech_helper import *
 import speech_recognition as sr # also implicity requires pyaudio
 
-# helper functions
-def anyWordInString(words, string):
-    for word in words:
-        if word in string:
-            return True
-    return False
-
-def allWordsInString(words, string):
-    for word in words:
-        if word not in string:
-            return False
-    return True
-
 class SpeechControlAddon(Addon):
     def __init__(self, page):
         Addon.__init__(self, page)
