@@ -78,6 +78,15 @@ class Page(object):
         self.title = title
         self.separator_color = separator_color
 
+    def get_first(self, component_type):
+        for i in range(len(self.sections)):
+            comp = self.sections[i]
+            if component_type == "logo" and isinstance(comp, Row) and comp.type == "logo":
+                return [comp, i]
+            elif component_type == "navbar" and isinstance(comp, NavBar):
+                return [comp, i]
+        return None
+
     def check(self):
         print("\nChecking page to issue warnings if necessary...")
 
