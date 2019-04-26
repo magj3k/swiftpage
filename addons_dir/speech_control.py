@@ -1,18 +1,6 @@
 from addons_dir.addon import *
+from addons_dir.speech_helper import *
 import speech_recognition as sr # also implicity requires pyaudio
-
-# helper functions
-def anyWordInString(words, string):
-    for word in words:
-        if word in string:
-            return True
-    return False
-
-def allWordsInString(words, string):
-    for word in words:
-        if word not in string:
-            return False
-    return True
 
 class SpeechControlAddon(Addon):
     def __init__(self, page):
@@ -28,14 +16,65 @@ class SpeechControlAddon(Addon):
             # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
             # instead of `r.recognize_google(audio)`
             recognized_speech = recognizer.recognize_google(audio)
-            print("Speech: " + recognized_speech)
+            while recognized_speech != None:
+                matches = []
+                print("Speech: " + recognized_speech)
 
-            if anyWordInString(["reload", "refresh"], recognized_speech) or allWordsInString(["load", "page"], recognized_speech):
-                self.server_commands.append("refresh")
-            if allWordsInString(["scroll", "to", "bottom"], recognized_speech) or allWordsInString(["go", "to", "bottom"], recognized_speech) or allWordsInString(["go", "to", "end"], recognized_speech) or allWordsInString(["scroll", "to", "end"], recognized_speech):
-                self.server_commands.append("scroll_to_bottom")
-            if allWordsInString(["scroll", "to", "top"], recognized_speech) or allWordsInString(["go", "to", "top"], recognized_speech) or allWordsInString(["go", "to", "start"], recognized_speech) or allWordsInString(["scroll", "to", "start"], recognized_speech) or allWordsInString(["scroll", "to", "begin"], recognized_speech) or allWordsInString(["go", "to", "begin"], recognized_speech):
-                self.server_commands.append("scroll_to_top")
+                # server commands first
+                match = match_expression("refresh", recognized_speech)
+                if match != None:
+                    self.server_commands.append("refresh")
+                    matches.append(match[:])
+
+                match = match_expression("scroll to bottom", recognized_speech)
+                if match != None:
+                    self.server_commands.append("scroll_to_bottom")
+                    matches.append(match[:])
+
+                match = match_expression("scroll to top", recognized_speech)
+                if match != None:
+                    self.server_commands.append("scroll_to_top")
+                    matches.append(match[:])
+
+                # destructive modification commands next
+                match = match_any_expression(["reset changes", "clear everything"], recognized_speech)
+                if match != None:
+                    self.queued_modifications.append("clear")
+                    matches.append(match[:])
+
+                match = match_any_expression(["delete logo text background", "logo text background off"], recognized_speech)
+                if match != None:
+                    self.queued_modifications.append("remove_logo_bg")
+                    matches.append(match[:])
+
+                match = match_any_expression(["restore logo text background", "logo text background on"], recognized_speech)
+                if match != None:
+                    self.queued_modifications.append("restore_logo_bg")
+                    matches.append(match[:])
+
+                match = match_any_expression(["delete navbar", "navbar off"], recognized_speech)
+                if match != None:
+                    self.queued_modifications.append("remove_navbar")
+                    matches.append(match[:])
+
+                match = match_any_expression(["restore navbar", "navbar on"], recognized_speech)
+                if match != None:
+                    self.queued_modifications.append("restore_navbar")
+                    matches.append(match[:])
+
+                # constructive modification commands last
+                match = match_expression("set title to", recognized_speech)
+                if match != None and len(match[1]) > 0:
+                    title = match[1][0].title()
+                    self.queued_modifications.append("title_to "+title)
+                    matches.append(match[:])
+
+                # processes additional commands
+                recognized_speech = None
+                for match in matches:
+                    if match[2] != None:
+                        recognized_speech = match[2]
+                        break
 
         except sr.UnknownValueError:
             # print("Speech recognition could not understand audio")
