@@ -23,14 +23,33 @@ synonyms = [
     ["changes", "modifications", "edits"],
     ["everything", "all", "every"],
     ["left", "lefthand"],
-    ["righthand", "right"],
-    ["on", "enable", "bring", "restore", "add", "reset"],
+    ["right", "righthand"],
+    ["on", "enable", "bring", "restore", "reset"],
     ["off", "disable", "remove", "close", "erase", "delete", "clear", "rid"],
     ["text", "label", "string", "title"],
     ["background", "behind", "bg", "wallpaper", "wall"],
     ["and", "then"],
-    ["maybe", "possibly", "kindof", "sortof", "perhaps", "actually", "definitely"],
+    ["maybe", "possibly", "kindof", "sortof", "perhaps", "actually", "definitely", "yeah"],
+    ["number", "letter"],
     ["navigation", "nav", "navbar"],
+    ["one", "first"],
+    ["two", "second", "to"],
+    ["three", "third"],
+    ["four", "fourth", "for"],
+    ["five", "fifth"],
+    ["six", "sixth"],
+    ["seven", "seventh"],
+    ["eight", "eighth", "ate"],
+    ["nine", "ninth"],
+    ["ten", "tenth"],
+    ["last", "final", "ending", "end"],
+    ["point", "dot", "decimal"],
+    ["add", "append", "create", "make", "new"],
+    ["it", "that", "previous", "last"],
+    ["more", "greater", "larger", "grander", "louder"],
+    ["less", "fewer", "smaller", "softer"],
+    ["button", "link"],
+    ["move", "put", "take"],
 ]
 for synonyms_list in synonyms:
     for synonym in synonyms_list:
@@ -39,10 +58,27 @@ for synonyms_list in synonyms:
         else:
             synonyms_dict[synonym] = synonyms_list
 
+numbers_dict = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+}
+
+colors_dict = {
+
+}
+
 def remove_nonsense_words(words):
     filtered_words = []
     for word in words:
-        if word not in synonyms_dict["maybe"]:
+        if word not in synonyms_dict["maybe"] and word not in synonyms_dict["number"]:
             filtered_words.append(word)
     return filtered_words
 
@@ -73,6 +109,32 @@ def match_any_expression(expressions_to_match, speech):
         if match != None:
             return match
     return None
+
+def extract_numbers(prefix, variables):
+    numbers = []
+
+    words_in_prefix = remove_nonsense_words(prefix.split(' '))
+    consideration_threshold = 0
+    for word in words_in_prefix:
+        if word in synonyms_dict and consideration_threshold == 0:
+            syns = synonyms_dict[word]
+            if syns[0] in numbers_dict:
+                consideration_threshold = 2
+                numbers.append(numbers_dict[syns[0]])
+        consideration_threshold = max(consideration_threshold-1, 0)
+
+    for variable in variables:
+        words_in_variable = remove_nonsense_words(variable.split(' '))
+        consideration_threshold = 0
+        for word in words_in_variable:
+            if word in synonyms_dict and consideration_threshold == 0:
+                syns = synonyms_dict[word]
+                if syns[0] in numbers_dict:
+                    consideration_threshold = 2
+                    numbers.append(numbers_dict[syns[0]])
+            consideration_threshold = max(consideration_threshold-1, 0)
+
+    return numbers
 
 def match_expression(expression_to_match, speech): # returns tuple of prefix and variables
     variables = []
@@ -129,10 +191,14 @@ def match_expression(expression_to_match, speech): # returns tuple of prefix and
             if next_expression_start == -1:
                 variables = [ concatenate(words_in_speech[speech_pointer+1:]) ]
             else:
-                variables = [ concatenate(words_in_speech[speech_pointer+1:next_expression_start]) ]
+                variables = [ concatenate(words_in_speech[speech_pointer+1:next_expression_start-1]) ]
                 next_phrase = concatenate(words_in_speech[next_expression_start:])
                     
             break
+
+    # extracts numbers
+    numbers = extract_numbers(prefix, variables)
+    variables += numbers
 
     return [prefix, variables, next_phrase]
 
@@ -147,3 +213,6 @@ def match_expression(expression_to_match, speech): # returns tuple of prefix and
 # print(match_expression("reset changes","please reset all of my changes and scroll back up to the top"))
 # print(match_expression("set title to","change the title to archipelago game"))
 # print(match_expression("set (title,background) to","change the background to red"))
+# print(match_expression("delete second navbar","please remove the second navbar from the page"))
+# print(match_expression("add navbar","add a new navbar above the second one"))
+# print(match_expression("set title to","change the title of my page to project page and delete the logo text background"))
