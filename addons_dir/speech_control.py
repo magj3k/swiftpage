@@ -10,6 +10,10 @@ class SpeechControlAddon(Addon):
         self.microphone = None
         self.stop_listening = None
 
+        self.context = {
+            "variables": []
+        }
+
     def process_audio(self, recognizer, audio):
         try:
             # for testing purposes, we're just using the default API key
@@ -77,7 +81,7 @@ class SpeechControlAddon(Addon):
                         break
 
         except sr.UnknownValueError:
-            # print("Speech recognition could not understand audio")
+            print("Speech recognition could not understand audio")
             pass
         except sr.RequestError as e:
             print("Could not request results from Speech Recognition service; {0}".format(e))
