@@ -87,6 +87,12 @@ class Page(object):
                 return [comp, i]
         return None
 
+    def get_component(self, component_type, number=1):
+        if number != 1:
+            # search for numberth component
+            pass
+        return self.get_first(component_type)
+
     def check(self):
         print("\nChecking page to issue warnings if necessary...")
 
