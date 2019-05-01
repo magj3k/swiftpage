@@ -1,3 +1,5 @@
+import colorsys as cs
+from math import *
 
 # builds synonyms dict for quick lookup use later
 synonyms_dict = {}
@@ -5,17 +7,16 @@ synonyms = [
     ["try", "do"],
     ["go","scroll", "jump", "show"],
     ["to", "at", "2"],
-    ["top", "begin", "beginning", "start", "upper"],
+    ["top", "begin", "beginning", "start", "upper", "start"],
     ["bottom", "floor", "end", "final"],
     ["title", "logo", "header", "beginning"],
     ["color", "shade"],
-    ["brightness", "shine", "white"],
     ["next", "after"],
     ["gradient", "shade", "colorshift", "transition"],
     ["like", "similar", "around"],
     ["and", "also"],
     ["set", "reset", "change", "alter", "modify", "switch", "turn"],
-    ["make", "force"],
+    ["make", "force", "turn"],
     ["say", "list", "read", "show"],
     ["reload", "refresh"],
     ["please", "welcome", "thanks", "thank"],
@@ -50,6 +51,23 @@ synonyms = [
     ["less", "fewer", "smaller", "softer"],
     ["button", "link"],
     ["move", "put", "take"],
+    ["red", "cherry", "crimson"],
+    ["orange", "sunset", "apricot"],
+    ["yellow", "lemon", "sunny"],
+    ["green", "lime"],
+    ["blue", "ocean"],
+    ["purple", "violet"],
+    ["black", "dark"],
+    ["white", "bright", "light"],
+    ["grey", "gray", "ash"],
+    ["teal", "turquoise"],
+    ["rose", "rosy"],
+    ["brown", "cinnamon", "burnt", "burned"],
+    ["bright", "brighter", "light", "lighter", "lighten"],
+    ["darker", "dark", "dim", "dimmer", "darken"],
+    ["hashtag", "pound"],
+    ["again", "over"],
+    ["round", "rounded", "curved"],
 ]
 for synonyms_list in synonyms:
     for synonym in synonyms_list:
@@ -72,13 +90,113 @@ numbers_dict = {
 }
 
 colors_dict = {
-
+    "red": "#ff2600",
+    "orange": "#ff9300",
+    "yellow": "#fefb00",
+    "green": "#00ea00",
+    "blue": "#0432ff",
+    "purple": "#9437ff",
+    "black": "#000000",
+    "white": "#ffffff",
+    "gray": "#7a7a7a",
+    "pink": "#eb65ff",
+    "teal": "#00fdcc",
+    "rose": "#f5006b",
+    "brown": "#844c00",
 }
+
+def hex_2_rgb(hex_color):
+    h = hex_color.lstrip('#')
+    rgb = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+    return rgb
+
+def rgb_2_hsv(rgb):
+    h, s, v = cs.rgb_to_hsv(rgb[0]/255.0, rgb[1]/255.0, rgb[2]/255.0)
+    return (h, s, v)
+
+def hsv_2_rgb(hsv):
+    r, g, b = cs.hsv_to_rgb(hsv[0], hsv[1], hsv[2])
+    return (r*255.0, g*255.0, b*255.0)
+
+def rgb_2_hex(rgb):
+    return '#%02x%02x%02x' % (int(rgb[0]), int(rgb[1]), int(rgb[2]))
+
+def merge_colors(rgb_a, rgb_b, ratio_a_b=0.5):
+    return ( (rgb_a[0]*ratio_a_b)+(rgb_b[0]*(1-ratio_a_b)), (rgb_a[1]*ratio_a_b)+(rgb_b[1]*(1-ratio_a_b)), (rgb_a[2]*ratio_a_b)+(rgb_b[2]*(1-ratio_a_b)) )
+
+def merge_colors_hex(hex_a, hex_b):
+    hex_a_rgb = hex_2_rgb(hex_a)
+    hex_b_rgb = hex_2_rgb(hex_b)
+
+    hex_a_hsv = rgb_2_hsv(hex_a_rgb)
+    hex_b_hsv = rgb_2_hsv(hex_b_rgb)
+
+    merged_rgb = merge_colors(hex_a_rgb, hex_b_rgb)
+    merged_hsv = merge_colors(hex_a_hsv, hex_b_hsv)
+    merged_hsv_rgb = hsv_2_rgb(merged_hsv)
+
+    merged_overall = merge_colors(merged_rgb, merged_hsv_rgb, 0.6)
+    return rgb_2_hex(merged_overall)
+
+def inverse_color(hex_color):
+    rgb = hex_2_rgb(hex_color)
+    rgb_magnitude = sqrt( pow(rgb[0], 2.0) + pow(rgb[1], 2.0) + pow(rgb[2], 2.0) )+1.0
+    inverse_rgb = ( (255-rgb[0]), (255-rgb[1]), (255-rgb[2]) )
+    inverse_magnitude = sqrt( pow(inverse_rgb[0], 2.0) + pow(inverse_rgb[1], 2.0) + pow(inverse_rgb[2], 2.0) )+1.0
+
+    final_color = ( inverse_rgb[0]*rgb_magnitude/inverse_magnitude, inverse_rgb[1]*rgb_magnitude/inverse_magnitude, inverse_rgb[2]*rgb_magnitude/inverse_magnitude )
+
+    return rgb_2_hex(final_color)
+
+def extract_colors(variables, relative_color="#787878"):
+    colors = []
+    modifier_color = None
+
+    # checks for color modifier
+    more_or_less_found = None
+    for variable in variables:
+        for uncased_word in variable.split(' '):
+            word = uncased_word.lower()
+            if word in synonyms_dict["darker"]:
+                modifier_color = colors_dict["black"]
+            elif word in synonyms_dict["lighter"]:
+                modifier_color = colors_dict["white"]
+            elif word in synonyms_dict["more"]:
+                more_or_less_found = "more"
+            elif word in synonyms_dict["less"]:
+                more_or_less_found = "less"
+            elif len(word) >= 4 and (word[:-1] in synonyms_dict and word[-1:] == 'r' and synonyms_dict[word[:-1]][0] in colors_dict):
+                more_or_less_found = "more"
+                modifier_color = colors_dict[synonyms_dict[word[:-1]][0]]
+            elif len(word) >= 4 and (word[:-2] in synonyms_dict and word[-2:] == 'er' and synonyms_dict[word[:-2]][0] in colors_dict):
+                more_or_less_found = "more"
+                modifier_color = colors_dict[synonyms_dict[word[:-2]][0]]
+
+    if modifier_color != None:
+        colors.append( merge_colors_hex(relative_color, modifier_color) )
+
+    # extracts colors
+    for variable in variables:
+        for uncased_word in variable.split(' '):
+            word = uncased_word.lower()
+            if word in synonyms_dict and synonyms_dict[word][0] in colors_dict:
+                if more_or_less_found != None:
+                    if more_or_less_found == "more":
+                        extracted_color = colors_dict[synonyms_dict[word][0]]
+                        colors.append( merge_colors_hex(relative_color, extracted_color) )
+                    else:
+                        extracted_color = inverse_color(colors_dict[synonyms_dict[word][0]])
+                        colors.append( merge_colors_hex(relative_color, extracted_color) )
+                else:
+                    colors.append( colors_dict[synonyms_dict[word][0]] )
+
+    return colors
 
 def remove_nonsense_words(words):
     filtered_words = []
-    for word in words:
-        if word not in synonyms_dict["maybe"] and word not in synonyms_dict["number"]:
+    for uncased_word in words:
+        word = uncased_word.lower()
+        if word not in synonyms_dict["maybe"] and word not in synonyms_dict["number"] and word not in synonyms_dict["hashtag"]:
             filtered_words.append(word)
     return filtered_words
 
@@ -136,7 +254,7 @@ def extract_numbers(prefix, variables):
 
     return numbers
 
-def match_expression(expression_to_match, speech): # returns tuple of prefix and variables
+def match_expression(expression_to_match, speech, context=None): # returns tuple of prefix and variables
     variables = []
     prefix = speech
     next_phrase = None
@@ -200,6 +318,10 @@ def match_expression(expression_to_match, speech): # returns tuple of prefix and
     numbers = extract_numbers(prefix, variables)
     variables += numbers
 
+    # extracts colors
+    colors = extract_colors(variables)
+    variables += colors
+
     return [prefix, variables, next_phrase]
 
 # tests
@@ -216,3 +338,14 @@ def match_expression(expression_to_match, speech): # returns tuple of prefix and
 # print(match_expression("delete second navbar","please remove the second navbar from the page"))
 # print(match_expression("add navbar","add a new navbar above the second one"))
 # print(match_expression("set title to","change the title of my page to project page and delete the logo text background"))
+# print(match_expression("(make,set) title","turn the title green please"))
+# print(match_expression("(make,set) title","please make the title even oranger"))
+# print( rgb_2_hex(hex_2_rgb("#ff0000")) )
+# print( hsv_2_rgb(rgb_2_hsv( (255, 0, 0) )) )
+# print( rgb_2_hex(hsv_2_rgb(rgb_2_hsv(hex_2_rgb("#ff0000")))) )
+# print( rgb_2_hex(hsv_2_rgb( merge_colors(rgb_2_hsv(hex_2_rgb("#ff0000")), rgb_2_hsv(hex_2_rgb("#0000ff"))) )) )
+# print( merge_colors_hex("#ffffff", "#0000ff") )
+# print( merge_colors_hex("#e7db74", "#282923") )
+# print(match_expression("(make,set) title","change the title color to white"))
+# print(match_expression("(make,set) title","change the title color to blue"))
+# print(match_expression("(make,set) (logo,title) background", "make the title background red"))

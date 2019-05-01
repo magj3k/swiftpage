@@ -11,7 +11,9 @@ class SpeechControlAddon(Addon):
         self.stop_listening = None
 
         self.context = {
-            "variables": []
+            "variables": [],
+            "object": None,
+            "description": None,
         }
 
     def process_audio(self, recognizer, audio):
@@ -41,7 +43,7 @@ class SpeechControlAddon(Addon):
                     matches.append(match[:])
 
                 # destructive modification commands next
-                match = match_any_expression(["reset changes", "clear everything"], recognized_speech)
+                match = match_any_expression(["reset changes", "clear everything", "start again"], recognized_speech)
                 if match != None:
                     self.queued_modifications.append("clear")
                     matches.append(match[:])
@@ -51,31 +53,52 @@ class SpeechControlAddon(Addon):
                     self.queued_modifications.append("remove_logo_bg")
                     matches.append(match[:])
 
-                match = match_any_expression(["restore logo text background", "logo text background on"], recognized_speech)
+                match = match_any_expression(["restore logo (text,round) background", "logo (text,round) background on"], recognized_speech)
                 if match != None:
                     self.queued_modifications.append("restore_logo_bg")
                     matches.append(match[:])
 
-                match = match_any_expression(["delete navbar", "navbar off"], recognized_speech)
-                if match != None:
-                    self.queued_modifications.append("remove_navbar")
-                    matches.append(match[:])
-
-                match = match_any_expression(["restore navbar", "navbar on"], recognized_speech)
-                if match != None:
-                    self.queued_modifications.append("restore_navbar")
-                    matches.append(match[:])
-
                 # constructive modification commands last
-                match = match_expression("set title to", recognized_speech)
+                match_bg = match_any_expression(["(make,set) (logo,title) background"], recognized_speech)
+                if match_bg != None and len(match_bg[1]) > 0:
+                    for variable in match_bg[1]:
+                        if len(variable) > 1 and variable[0] == "#": # indicates a color
+                            self.queued_modifications.append("title_bg_to "+variable)
+                            matches.append(match_bg[:])
+                            break
+
+                match = match_any_expression(["(make,set) (logo,title) (text,round) background"], recognized_speech)
                 if match != None and len(match[1]) > 0:
+                    for variable in match[1]:
+                        if len(variable) > 1 and variable[0] == "#": # indicates a color
+                            self.queued_modifications.append("title_text_bg_to "+variable)
+                            matches.append(match[:])
+                            break
+
+                match = match_expression("set title (to,say)", recognized_speech)
+                match_color_a = match_expression("(make,set) title", recognized_speech)
+                match_color_b = match_expression("(make,set) title color", recognized_speech)
+                if match_color_b != None and len(match_color_b[1]) > 0:
+                    for variable in match_color_b[1]:
+                        if len(variable) > 1 and variable[0] == "#": # indicates a color
+                            self.queued_modifications.append("title_color_to "+variable)
+                            matches.append(match_color_b[:])
+                            break
+                elif match != None and len(match[1]) > 0:
                     title = match[1][0].title()
                     self.queued_modifications.append("title_to "+title)
                     matches.append(match[:])
+                elif match_bg == None and match_color_a != None and len(match_color_a[1]) > 0:
+                    for variable in match_color_a[1]:
+                        if len(variable) > 1 and variable[0] == "#": # indicates a color
+                            self.queued_modifications.append("title_color_to "+variable)
+                            matches.append(match_color_a[:])
+                            break
 
                 # processes additional commands
                 recognized_speech = None
                 for match in matches:
+                    print("Speech interpretation: "+str(match))
                     if match[2] != None:
                         recognized_speech = match[2]
                         break
@@ -99,5 +122,5 @@ class SpeechControlAddon(Addon):
         
     def stop(self):
         print("Speech control addon stopped")
-        self.stop_listening()
+        if self.stop_listening != None: self.stop_listening()
 
