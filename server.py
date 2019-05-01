@@ -24,6 +24,7 @@ dev_page_prefix = '''
 dev_page_middle = '\\'+'r'+'\\'+'n'+'|'+'\\'+'n'+'|'+'\\'+'r'
 dev_page_suffix = ''')|$)/gm)
                 for (var i = 0; i < lines.length; i++) {
+                    console.log(lines[i]);
                     if (lines[i] === 'refresh') {
                         // location.reload(false);
                         var iframe = document.getElementsByName('content_window')[0];
