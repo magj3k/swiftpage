@@ -2,7 +2,7 @@ import os
 from elements import *
 
 # import custom addons here
-# from addons._ import *
+# from addons_dir._ import *
 from addons_dir.speech_control import *
 
 class AddonsModifier(object): # loads saved modifications and applies them to current page
@@ -33,13 +33,18 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
             if "restore_logo_bg" in mod:
                 if logo_row != None:
                     logo_row[0].metadata["rounded"] = "true"
-            if "remove_navbar" in mod:
-                if navbar != None:
-                    components_to_delete.append(navbar[1])
-            if "restore_navbar" in mod:
-                if navbar != None:
-                    while navbar[1] in components_to_delete:
-                        components_to_delete.remove(navbar[1])
+            if "title_color_to" in mod:
+                color = mod[15:]
+                if logo_row != None:
+                    logo_row[0].metadata["text-color"] = color
+            if "title_bg_to" in mod:
+                color = mod[12:]
+                if logo_row != None:
+                    logo_row[0].metadata["background-colors"] = [color]
+            if "title_text_bg_to" in mod:
+                color = mod[17:]
+                if logo_row != None:
+                    logo_row[0].metadata["rounded-color"] = color
 
         # deletes elements from page
         for i in components_to_delete:
