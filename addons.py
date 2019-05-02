@@ -1,5 +1,5 @@
 import os, sys
-from elements import *
+from util.elements import *
 sys.path.append('./addons')
 
 # import custom addons here

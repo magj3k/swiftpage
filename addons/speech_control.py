@@ -1,3 +1,4 @@
+import sys
 sys.path.append('./addons')
 from addon import *
 from speech_helper import *
