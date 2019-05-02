@@ -1,9 +1,6 @@
 import colorsys as cs
 from math import *
 
-import colorsys as cs
-from math import *
-
 # builds synonyms dict for quick lookup use later
 synonyms_dict = {}
 synonyms = [
