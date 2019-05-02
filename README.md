@@ -8,15 +8,7 @@ SwiftPage is a series of Python scripts that let you generate good-looking websi
 
 Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help you transform your one-off webpages from...
 
-<table border='0'>
-    <tr><td>
-        <img src='readme_resources/site_example_a.png'>
-    </td>
-    <td width='84'><center>This<br>&larr;<br><br>To this<br>&rarr;</center></td>
-    <td>
-        <img src='readme_resources/site_example_b.png'>
-    </td></tr>
-</table>
+![page_comparison](readme_resources/page_comparison.png)
 
 SwiftPage will let you easily generate a well-designed, aesthetically pleasing webpage without knowing modern web development techniques or good design precedents.  It's quick and dirty webpages made easy and beautiful!
 
@@ -373,4 +365,61 @@ Example construction:
 
 
 
+To summarize, a Section could be defined like this (which can also be found in page.py):
+
+```
+Section("Archipelago", "An app project I made once", "archipelago", [
+    {
+        "name": "Test Links:",
+        "type": "links",
+        "links": [
+            { "name": "External Link", "address": "http://www.magmhj.com/" },
+            { "name": "Internal Link", "address": "#archipelago" }
+        ]
+    },
+    {
+        "name": "Images:",
+        "type": "img_gallery",
+    },
+    {
+        "name": "Trailer:",
+        "type": "video-youtube",
+        "address": "https://www.youtube.com/embed/NKnghW8DiI8"
+    },
+    {
+        "name": "Downloads:",
+        "type": "files",
+        "links": [
+            {"name": "Test Valid Download", "filename": "LaVieEnRose.tps"},
+            {"name": "Test Invalid Download"}
+        ]
+    },
+])
+```
+
 ### NavBars
+
+NavBars (or Navigation Bars) are Components that organize links horizontally with stylized icons.  NavBars are constructed only with a dictionary of links as a parameter.
+
+Each link item is indexed by a key that represents the "filename" corresponding to that link.  SwiftPage later searches for corresponding icons at `site/images/nav_[filename].png` and `site/images/[filename]_icon.png`.
+
+Each link item is a dictionary that can contain the following parameters:
+
+- "address": String, destination link address, will open in current tab/window if first character of address is "#"
+- "color": String hex code, optional, defines the background color of the link, automatically calculated if left unspecified
+
+Example construction:
+
+```
+NavBar({
+    "facebook": {"address": "http://www.facebook.com/"},
+    "soundcloud": {"address": "#"},
+    "linkedin": {"address": "#", "color": "#0a4767"},
+    "archipelago": {"address": "#archipelago", "color": "#684bb7"}
+})
+```
+
+Appearance:
+
+![row_navbar](readme_resources/row_navbar.png)
+

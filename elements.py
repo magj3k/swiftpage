@@ -228,7 +228,7 @@ class NavBar(object):
                 if link_color == "":
                     link_color = self.calculate_link_color("site/images/"+link_name+"_icon.png")
                 else:
-                    get_img_and_resize("site/images/nav_"+link_name+".png", size='small')
+                    get_img_and_resize("site/images/"+link_name+"_icon.png", size='small')
                 rendered_bar += "<div class='column' style='background-color: "+link_color+"'><div class='vertical-center'><div class='icon'><img src='images/"+link_name+"_icon.png' width='100%'></div></div></div>\n"
 
             if link_address != None and link_address != "":
