@@ -1,4 +1,4 @@
-from elements import *
+from util.elements import *
 from addons import *
 from page import *
 

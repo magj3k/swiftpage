@@ -1,4 +1,4 @@
-from elements import *
+from util.elements import *
 
 page_title = "SwiftPage Demo"
 

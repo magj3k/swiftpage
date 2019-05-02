@@ -1,8 +1,8 @@
-import os
+import os, sys
+sys.path.append('./addons')
 
 # import custom addons here
-# from addons._ import *
-from addons_dir.speech_control import *
+from speech_control import *
 
 class AddonsModifier(object): # loads saved modifications and applies them to current page
     def __init__(self, page):
@@ -21,10 +21,16 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
 class AddonsServer(object): # saves modifications to file
     def __init__(self, page):
         self.page = page
+
+        # maintains copy of modified page
+        self.modifier = AddonsModifier(self.page)
+
+        # addons
         self.addons = [
-            SpeechControlAddon(page)
+            SpeechControlAddon(page, self.modifier)
         ]
 
+        # modifications saved to disk
         self.modifications_string = ""
         if os.path.isfile(".modifications"):
             f = open(".modifications", "r")

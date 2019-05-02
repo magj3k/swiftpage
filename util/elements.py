@@ -3,7 +3,7 @@ import colorsys as cs
 from math import *
 from PIL import Image
 from shutil import copyfile
-from manip import *
+from util.manip import *
 
 def sizing_function(x):
     val = 0.6
