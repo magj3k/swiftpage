@@ -161,7 +161,7 @@ The "filename" parameter points to all files within the `site/` directory that a
 
 For each Section, a "Header" Row is automatically generated, which displays the main Section icon with the specified Section name and subtitle, like so:
 
-![row_section_header](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_section_header.png)
+![row_section_header](/readme_resources/row_section_header.png)
 
 
 
@@ -194,7 +194,7 @@ Example construction:
 
 Appearance:
 
-![row_img_gallery](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_img_gallery.png)
+![row_img_gallery](/readme_resources/row_img_gallery.png)
 
 
 
@@ -224,7 +224,7 @@ Example construction:
 
 Appearance:
 
-![row_links](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_links.png)
+![row_links](/readme_resources/row_links.png)
 
 
 
@@ -247,7 +247,7 @@ Example construction:
 
 Appearance:
 
-![row_youtube](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_youtube.png)
+![row_youtube](/readme_resources/row_youtube.png)
 
 
 
