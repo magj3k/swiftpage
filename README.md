@@ -1,10 +1,10 @@
 # SwiftPage
 
-### What is SwiftPage?
+## What is SwiftPage?
 
 SwiftPage is a series of Python scripts that let you generate good-looking websites in minutes with no web development experience nor design intuition.  Generated SwiftPages are aesthetically-pleasing, incredibly easy to set up and edit, and mobile-friendly.
 
-### What can I use SwiftPage for?
+## What can I use SwiftPage for?
 
 Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help you transform your one-off webpages from this:
 
@@ -20,19 +20,19 @@ Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help
 
 SwiftPage will let you easily generate a well-designed, aesthetically pleasing webpage without knowing modern web development techniques or good design precedents.  It's quick and dirty webpages made easy and beautiful!
 
-### What makes SwiftPage unique?
+## What makes SwiftPage unique?
 
 Many tools already exist for creating websites without needing to know any coding language or technical procedure.  Many of these tools, however, still require users to learn a new user interface or spend lots of extra time trying to make something aesthetically pleasing.
 
 SwiftPage makes all of these issues pretty much trivial – SwiftPage lets you create content-rich webpages in *minutes* that look great *by default* (and they're mobile-friendly).
 
-### What are some SwiftPage examples?
+## What are some SwiftPage examples?
 
 My Website - http://www.magmhj.com
 
 MIT Animation Groups Website - http://mitag.mit.edu
 
-### How do I set up SwiftPage and what are its dependencies?
+## How do I set up SwiftPage and what are its dependencies?
 
 SwiftPage relies on one external Python package (at the moment), which can be installed using the following terminal command(s):
 
@@ -48,7 +48,7 @@ cd swiftpage/
 python create_page.py
 ```
 
-### How do I use SwiftPage?
+## How do I use SwiftPage?
 
 SwiftPage provides two scripts, `create_page.py` and `server.py` that you can run to generate a new HTML5 website in the `site/` directory.
 
@@ -62,11 +62,11 @@ SwiftPage works by generating code that fits to the preexisting contents of the 
 
 **TL/DR:** `python create_page.py` generates your page *once*, `python server.py` generates your page whenever `page.py` changes.
 
-### How can I customize my SwiftPages?
+## How can I customize my SwiftPages?
 
 To customize your SwiftPage, change the rendered `Page` object in `page.py`.  `Page` objects can be created with a specified list of Components, like Rows, NavBars, and Sections.  Each of these Components has certain parameters which affect its appearance and behavior as follows:
 
-#### Rows
+### Rows
 
 Rows have lots of different capabilities, but they are the smallest singular units of information that SwiftPage parses and renders.  When constructing a new Row, its **first parameter** is a string that defines the Row's **type**, which determines what additional information it requires.  Its **second parameter** is a dictionary of **relevant metadata** about the Row that is specific for the Row's type.
 
@@ -74,7 +74,7 @@ Here is a list of currently-supported standalone Row types and the parameters th
 
 
 
-##### Type: Logo - "logo"
+#### Type: Logo - "logo"
 
 Metadata parameters:
 
@@ -105,7 +105,7 @@ Appearance:
 
 
 
-##### Type: Footer - "footer"
+#### Type: Footer - "footer"
 
 Metadata parameters:
 
@@ -131,7 +131,7 @@ Appearance:
 
 All other Row types are not intended for standalone use – they are created and managed by Section objects, which are explained further in the section below.
 
-#### Sections
+### Sections
 
 Sections essentially cluster related rows together.  For example, you could create a Section dedicated to a product, project, client, or service and all included Rows would share the same aesthetic theme.
 
@@ -171,7 +171,7 @@ The "row_info" parameter defines the Rows that the Section contains/owns.  Each 
 
 
 
-##### Type: Image Gallery - "img_gallery"
+#### Type: Image Gallery - "img_gallery"
 
 Behavior:
 
@@ -198,7 +198,7 @@ Appearance:
 
 
 
-##### Type: Links Panel - "links"
+#### Type: Links Panel - "links"
 
 Behavior:
 
@@ -228,7 +228,7 @@ Appearance:
 
 
 
-##### Type: YouTube Video/Playlist - "video-youtube"
+#### Type: YouTube Video/Playlist - "video-youtube"
 
 Metadata parameters:
 
@@ -251,7 +251,7 @@ Appearance:
 
 
 
-##### Type: Vimeo Video - "video-vimeo"
+#### Type: Vimeo Video - "video-vimeo"
 
 Metadata parameters:
 
@@ -274,7 +274,7 @@ Appearance:
 
 
 
-##### Type: Downloadable Files List - "files"
+#### Type: Downloadable Files List - "files"
 
 Metadata parameters:
 
@@ -302,4 +302,4 @@ Appearance:
 
 
 
-#### NavBars
+### NavBars
