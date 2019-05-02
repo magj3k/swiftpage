@@ -8,11 +8,15 @@ SwiftPage is a series of Python scripts that let you generate good-looking websi
 
 Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help you transform your one-off webpages from this:
 
-
-
-To this:
-
-
+<table border='0'>
+    <tr><td>
+        <img src='readme_resources/site_example_a.png'>
+    </td>
+    <td width='90'><center>To this:</center></td>
+    <td>
+        <img src='readme_resources/site_example_b.png'>
+    </td></tr>
+</table>
 
 SwiftPage will let you easily generate a well-designed, aesthetically pleasing webpage without knowing modern web development techniques or good design precedents.  It's quick and dirty webpages made easy and beautiful!
 
@@ -131,7 +135,119 @@ All other Row types are not intended for standalone use – they are created and
 
 Sections essentially cluster related rows together.  For example, you could create a Section dedicated to a product, project, client, or service and all included Rows would share the same aesthetic theme.
 
+Every Section is constructed with six parameters (three optional): 
 
+- "name": String, the displayed name of the Section header
+- "subtitle": String, the displayed subtitle of the Section header
+- "filename": String, the prefix used within the `site/` directory to house all files related to this Section
+- "row_info": List of dictionaries, optional, list of the metadata of the Section's Rows
+- "primary_color": String hex code, optional, the main color of the Section
+- "secondary_color": String hex code, optional, the secondary color of the Section used to separate Rows
+
+Example construction:
+
+```
+Section("Archipelago", "An app project I made once", "archipelago", [
+    {
+        "name": "Images:",
+        "type": "img_gallery",
+    }
+])
+```
+
+
+
+The "filename" parameter points to all files within the `site/` directory that are associated with this Section.  This means that, when generating your page, SwiftPage will search for an image with the filepath `site/images/[filename]_icon.png` to use as the main Section icon.  Also, if the "primary_color" and "secondary_color" parameters are left unspecified, SwiftPage will automatically estimate a series of complimentary colors to use for the Section based on the Section's main icon.
+
+For each Section, a "Header" Row is automatically generated, which displays the main Section icon with the specified Section name and subtitle, like so:
+
+![row_section_header](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_section_header.png)
+
+
+
+The "filename" parameter also points to other files within the `site/` directory in some Rows, which are explained further below.
+
+The "row_info" parameter defines the Rows that the Section contains/owns.  Each element in "row_info" is the metadata of the Row, which defines its type, content, appearance, etc.  These Rows inherit color and other stylistic traits from their parent Sections.  SwiftPage currently supports the following sub-Section Row types (not intended to be standalone), which can be created with the syntax described below:
+
+
+
+##### Type: Image Gallery - "img_gallery"
+
+Behavior:
+
+- This type of Row will automatically search through the `site/images/[filename]/` directory for any image (.png, .jpg, .jpeg) files and display them in a horizontally-scrollable gallery.  Each image is sized automatically according to its width-to-height ratio.
+
+Metadata parameters:
+
+- "name": String, optional, if specified will generate a title Row with this name
+- "multipliers": List of numbers, optional, the i-th number of this list (denoted `c`) will make the i-th image in this Row `c` times larger
+- "extension": String, optional, if specified will search through the `site/images/[filename]/[extension]/` directory for images instead of `site/images/[filename]/`
+
+Example construction:
+
+```
+{
+    "name": "Images:",
+    "type": "img_gallery",
+}
+```
+
+Appearance:
+
+![row_img_gallery](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_img_gallery.png)
+
+
+
+##### Type: Links Panel - "links"
+
+Behavior:
+
+- This type of Row will hold any specified links and stylize them automatically.  Links with "addresses" that start with "#" will open in the same tab/window, all others will not.  (NOTE: All Sections are tagged with `<a name='[filename]'>` so you can link to them with the address `#[filename]`.)
+
+Metadata parameters:
+
+- "name": String, optional, if specified will generate a title Row with this name
+- "links": List of dictionaries, optional, each dictionary item needs a "name" (e.g. "MagMHJ.com") and "address" (e.g. "http://www.magmhj.com")
+
+Example construction:
+
+```
+{
+    "name": "Test Links:",
+    "type": "links",
+    "links": [
+        { "name": "External Link", "address": "http://www.magmhj.com/" },
+        { "name": "Internal Link", "address": "#archipelago" }
+    ]
+}
+```
+
+Appearance:
+
+![row_links](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_links.png)
+
+
+
+##### Type: YouTube Video/Playlist - "video-youtube"
+
+Metadata parameters:
+
+- "address": String, embed URL for YouTube video
+- "name": String, optional, if specified will generate a title Row with this name
+
+Example construction:
+
+```
+{
+    "name": "Trailer:",
+    "type": "video-youtube",
+    "address": "https://www.youtube.com/embed/NKnghW8DiI8"
+}
+```
+
+Appearance:
+
+![row_youtube](/Users/magnusjohnson/Library/Mobile Documents/com~apple~CloudDocs/Software/swiftpage/readme_resources/row_youtube.png)
 
 
 
