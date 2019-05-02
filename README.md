@@ -12,7 +12,7 @@ Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help
     <tr><td>
         <img src='readme_resources/site_example_a.png'>
     </td>
-    <td width='90'><center>To this:</center></td>
+    <td width='84'><center>To this:</center></td>
     <td>
         <img src='readme_resources/site_example_b.png'>
     </td></tr>
@@ -161,7 +161,7 @@ The "filename" parameter points to all files within the `site/` directory that a
 
 For each Section, a "Header" Row is automatically generated, which displays the main Section icon with the specified Section name and subtitle, like so:
 
-![row_section_header](/readme_resources/row_section_header.png)
+![row_section_header](readme_resources/row_section_header.png)
 
 
 
@@ -194,7 +194,7 @@ Example construction:
 
 Appearance:
 
-![row_img_gallery](/readme_resources/row_img_gallery.png)
+![row_img_gallery](readme_resources/row_img_gallery.png)
 
 
 
@@ -224,7 +224,7 @@ Example construction:
 
 Appearance:
 
-![row_links](/readme_resources/row_links.png)
+![row_links](readme_resources/row_links.png)
 
 
 
@@ -247,7 +247,58 @@ Example construction:
 
 Appearance:
 
-![row_youtube](/readme_resources/row_youtube.png)
+![row_youtube](readme_resources/row_youtube.png)
+
+
+
+##### Type: Vimeo Video - "video-vimeo"
+
+Metadata parameters:
+
+- "address": String, embed URL for Vimeo video
+- "name": String, optional, if specified will generate a title Row with this name
+
+Example construction:
+
+```
+{
+    "type": "video-vimeo",
+    "name": "Demo Video:",
+    "address": "https://player.vimeo.com/video/242282080",
+}
+```
+
+Appearance:
+
+![row_vimeo](readme_resources/row_vimeo.png)
+
+
+
+##### Type: Downloadable Files List - "files"
+
+Metadata parameters:
+
+- "name": String, optional, if specified will generate a title Row with this name
+- "links": List of dictionaries, optional, each dictionary item needs a "name" (e.g. "Primary Download") and an "address" or "filename" giving the name of the file within the `site/files/[section filename]/` directory (e.g. "download.zip" will generate a link to `site/files/[section filename]/download.zip` if the file exists)
+
+Example construction:
+
+```
+{
+    "name": "Downloads:",
+    "type": "files",
+    "links": [
+        {"name": "Test Valid Download", "filename": "LaVieEnRose.tps"},
+        {"name": "Test Invalid Download"}
+    ]
+}
+```
+
+Appearance:
+
+![row_files](readme_resources/row_files.png)
+
+
 
 
 
