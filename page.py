@@ -40,7 +40,7 @@ page = Page([
                 {"name": "Test Valid Download", "filename": "LaVieEnRose.tps"},
                 {"name": "Test Invalid Download"}
             ]
-        }
+        },
     ]),
     Row("footer", {}),
 ], "index.html", page_title)

@@ -512,7 +512,7 @@ class Row(object):
                         # checks that filename exists, else replaces with unknown symbol
                         file_exists = os.path.isfile("site/images/"+filename)
                         if not file_exists:
-                            filename = str(self.metadata["filename"])+person["filename"]
+                            filename = str(self.metadata["filename"])+"/"+person["filename"]
                             file_exists = os.path.isfile("site/images/"+filename)
 
                             if not file_exists: 

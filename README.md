@@ -6,13 +6,13 @@ SwiftPage is a series of Python scripts that let you generate good-looking websi
 
 ## What can I use SwiftPage for?
 
-Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help you transform your one-off webpages from this:
+Need a quick and dirty webpage that doesn't look like crap?  SwiftPage will help you transform your one-off webpages from...
 
 <table border='0'>
     <tr><td>
         <img src='readme_resources/site_example_a.png'>
     </td>
-    <td width='84'><center>To this:</center></td>
+    <td width='84'><center>This<br>&larr;<br><br>To this<br>&rarr;</center></td>
     <td>
         <img src='readme_resources/site_example_b.png'>
     </td></tr>
@@ -299,6 +299,77 @@ Appearance:
 ![row_files](readme_resources/row_files.png)
 
 
+
+#### Type: People/Team List - "people"
+
+Metadata parameters:
+
+- "name": String, optional, if specified will generate a title Row with this name
+- "people": List of dictionaries, optional, each dictionary item needs a "name" (e.g. "Magnus Johnson") and a "filename" giving the name of the image file within the `site/images/[section filename]/people/` or `site/images/[section filename]/` directories
+
+Example construction:
+
+```
+{
+    "name": "Project Team:",
+    "type": "people",
+    "people": [
+        {"name": "Magnus J", "filename": "me.png"},
+        {"name": "Magnus Viking", "filename": "me_in_hat.jpg"},
+        {"name": "Ice Bear", "filename": "bear.jpeg"},
+    ]
+}
+```
+
+Appearance:
+
+![row_people](readme_resources/row_people.png)
+
+
+
+#### Type: Text Block - "text"
+
+Metadata parameters:
+
+- "name": String, optional, if specified will generate a title Row with this name
+- "height": Integer, optional, defines the height (in pixels) of this Row
+- "text": String, optional, text that is displayed
+
+Example construction:
+
+```
+{
+    "name": "Biography:",
+    "type": "text",
+    "text": "T-bone tenderloin pig, filet mignon meatball porchetta...",
+},
+```
+
+Appearance:
+
+![row_text](readme_resources/row_text.png)
+
+
+
+#### Type: Custom Row - "custom"
+
+Metadata parameters:
+
+- "name": String, optional, if specified will generate a title Row with this name
+- "height": Integer, optional, defines the height (in pixels) of this Row
+- "size": String, optional, makes Row taller when value is set to "large" or "big", and "height" parameter is undefined
+- "snippet": String, optional, HTML snippet of code that is rendered
+
+Example construction:
+
+```
+{
+    "name": "HTML Widget:",
+    "type": "custom",
+    "size": "big",
+    "snippet": "<object> Insert HTML Object Here </object>",
+},
+```
 
 
 
