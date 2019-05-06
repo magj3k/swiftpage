@@ -82,16 +82,39 @@ class Page(object):
         for i in range(len(self.sections)):
             comp = self.sections[i]
             if component_type == "logo" and isinstance(comp, Row) and comp.type == "logo":
-                return [comp, i]
+                return [comp, i, 0]
+            elif component_type == "footer" and isinstance(comp, Row) and comp.type == "footer":
+                return [comp, i, 0]
             elif component_type == "navbar" and isinstance(comp, NavBar):
-                return [comp, i]
+                return [comp, i, 0]
+            elif isinstance(comp, Row) and comp.type == component_type:
+                return [comp, i, 0]
         return None
 
     def get_component(self, component_type, number=1):
-        if number != 1:
-            # search for numberth component
-            pass
-        return self.get_first(component_type)
+
+        # search for numberth component
+        counter = 0
+        for i in range(len(self.sections)):
+            comp = self.sections[i]
+            if component_type == "section" and isinstance(comp, Section):
+                counter += 1
+            elif isinstance(comp, Row) and comp.type == component_type:
+                counter += 1
+            elif component_type == "navbar" and isinstance(comp, NavBar):
+                counter += 1
+            elif isinstance(comp, Section):
+                for section_row in comp.rows:
+                    if section_row.type == component_type:
+                        counter += 1
+                    if counter == number:
+                        return [section_row, i, j]
+
+            if counter == number:
+                return [comp, i, 0]
+        
+        if number == 1: return self.get_first(component_type)
+        return None
 
     def check(self):
         print("\nChecking page to issue warnings if necessary...")

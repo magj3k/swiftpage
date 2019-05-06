@@ -78,12 +78,16 @@ class Network(torch.nn.Module):
         self.layers.append(self.layer_3)
         self.layer_4 = torch.nn.Linear(int(5*D_in)+int(5*D_out), int(5*D_in)+int(5*D_out))
         self.layers.append(self.layer_4)
-        self.layer_5 = torch.nn.Linear(int(5*D_in)+int(5*D_out), int(3*D_in)+int(3*D_out))
+        self.layer_5 = torch.nn.Linear(int(5*D_in)+int(5*D_out), int(5*D_in)+int(5*D_out))
         self.layers.append(self.layer_5)
-        self.layer_6 = torch.nn.Linear(int(3*D_in)+int(3*D_out), 2*D_out)
+        self.layer_6 = torch.nn.Linear(int(5*D_in)+int(5*D_out), int(5*D_in)+int(5*D_out))
         self.layers.append(self.layer_6)
-        self.layer_7 = torch.nn.Linear(2*D_out, D_out)
+        self.layer_7 = torch.nn.Linear(int(5*D_in)+int(5*D_out), int(3*D_in)+int(3*D_out))
         self.layers.append(self.layer_7)
+        self.layer_8 = torch.nn.Linear(int(3*D_in)+int(3*D_out), 2*D_out)
+        self.layers.append(self.layer_8)
+        self.layer_9 = torch.nn.Linear(2*D_out, D_out)
+        self.layers.append(self.layer_9)
 
     def forward(self, x):
         layeroutput = x
@@ -116,17 +120,19 @@ class Learner(object):
         y = Variable(self.dataset.getOutputsTensor(self.D_out))
 
         # trains network
-        for cycle in range(num_cycles):
-            y_pred = self.model(x)
-            loss = self.criterion(y_pred, y)
+        for i in range(100):
+            for cycle in range(num_cycles // 100):
+                y_pred = self.model(x)
+                loss = self.criterion(y_pred, y)
 
-            print("Cycle "+str(cycle)+", Loss: "+str(loss.data[0]))
+                print("Cycle "+str(cycle+int(i*num_cycles/100))+", Loss: "+str(loss.data[0]))
 
-            self.optimizer.zero_grad()
-            loss.backward()
-            self.optimizer.step()
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
 
-        torch.save(self.model, "savedmodel.pt")
+            print("Saved intermediate model")
+            torch.save(self.model, "savedmodel.pt")
 
     def test_network(self, test_input_data):
         for i in range(max(self.D_in-len(test_input_data), 0)):

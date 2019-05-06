@@ -5,7 +5,7 @@ from math import *
 synonyms_dict = {}
 synonyms = [
     ["try", "do"],
-    ["go","scroll", "jump", "show"],
+    ["go","scroll", "jump", "show", "find"],
     ["to", "at", "2"],
     ["top", "begin", "beginning", "start", "upper", "start"],
     ["bottom", "floor", "end", "final"],
@@ -14,14 +14,15 @@ synonyms = [
     ["next", "after"],
     ["gradient", "shade", "colorshift", "transition"],
     ["like", "similar", "around"],
-    ["and", "also"],
+    ["and", "also", "then"],
     ["set", "reset", "change", "alter", "modify", "switch", "turn"],
-    ["make", "force", "turn"],
+    ["make", "force", "turn", "makes"],
     ["say", "list", "read", "show"],
     ["reload", "refresh"],
     ["please", "welcome", "thanks", "thank"],
     ["clear", "restart", "reset", "undo"],
     ["changes", "modifications", "edits"],
+    ["change", "modification", "edit"],
     ["everything", "all", "every"],
     ["left", "lefthand"],
     ["right", "righthand"],
@@ -29,7 +30,6 @@ synonyms = [
     ["off", "disable", "remove", "close", "erase", "delete", "clear", "rid"],
     ["text", "label", "string", "title"],
     ["background", "behind", "bg", "wallpaper", "wall"],
-    ["and", "then"],
     ["maybe", "possibly", "kindof", "sortof", "perhaps", "actually", "definitely", "yeah"],
     ["number", "letter"],
     ["navigation", "nav", "navbar"],
@@ -45,8 +45,8 @@ synonyms = [
     ["ten", "tenth"],
     ["last", "final", "ending", "end"],
     ["point", "dot", "decimal"],
-    ["add", "append", "create", "make", "new"],
-    ["it", "that", "previous", "last"],
+    ["add", "append", "create", "new"],
+    ["it", "that", "previous", "last", "em", "him", "er", "her", "its"],
     ["more", "greater", "larger", "grander", "louder"],
     ["less", "fewer", "smaller", "softer"],
     ["button", "link"],
@@ -105,6 +105,28 @@ colors_dict = {
     "brown": "#844c00",
 }
 
+def extract_context(statement, context):
+    return_statement = ""
+    replace_context = True
+    words = statement.split(' ')
+    for i in range(len(words)):
+        word = words[i]
+
+        # stops context replacing if "and" is encountered
+        if word.lower() in synonyms_dict["and"]:
+            replace_context = False
+
+        # replaces pronous with contextual object
+        if replace_context == True and word.lower() in synonyms_dict["it"] and context["object"] != None:
+            return_statement += context["object"]
+        else:
+            return_statement += word
+
+        if i < len(words)-1:
+            return_statement += " "
+
+    return return_statement
+
 def hex_2_rgb(hex_color):
     h = hex_color.lstrip('#')
     rgb = tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
@@ -148,7 +170,7 @@ def inverse_color(hex_color):
 
     return rgb_2_hex(final_color)
 
-def extract_colors(variables, relative_color="#787878"):
+def extract_colors(variables):
     colors = []
     modifier_color = None
 
@@ -173,7 +195,9 @@ def extract_colors(variables, relative_color="#787878"):
                 modifier_color = colors_dict[synonyms_dict[word[:-2]][0]]
 
     if modifier_color != None:
-        colors.append( merge_colors_hex(relative_color, modifier_color) )
+        # colors.append( merge_colors_hex(relative_color, modifier_color) )
+        colors.append(modifier_color)
+        colors.append("colorneedsmerge")
 
     # extracts colors
     for variable in variables:
@@ -183,10 +207,14 @@ def extract_colors(variables, relative_color="#787878"):
                 if more_or_less_found != None:
                     if more_or_less_found == "more":
                         extracted_color = colors_dict[synonyms_dict[word][0]]
-                        colors.append( merge_colors_hex(relative_color, extracted_color) )
+                        # colors.append( merge_colors_hex(relative_color, extracted_color) )
+                        colors.append(extracted_color)
+                        colors.append("colorneedsmerge")
                     else:
                         extracted_color = inverse_color(colors_dict[synonyms_dict[word][0]])
-                        colors.append( merge_colors_hex(relative_color, extracted_color) )
+                        # colors.append( merge_colors_hex(relative_color, extracted_color) )
+                        colors.append(extracted_color)
+                        colors.append("colorneedsmerge")
                 else:
                     colors.append( colors_dict[synonyms_dict[word][0]] )
 
@@ -221,12 +249,21 @@ def break_into_words(word_segment):
 
     return words
 
-def match_any_expression(expressions_to_match, speech):
+def match_any_expression(expressions_to_match, speech, context=None):
     for expr in expressions_to_match:
-        match = match_expression(expr, speech)
+        match = match_expression(expr, speech, context)
         if match != None:
             return match
     return None
+
+def extract_directions(prefix):
+    words_in_prefix = prefix.split(' ')
+    directions = []
+    for word in words_in_prefix:
+        if word.lower() in synonyms_dict["left"] or word.lower() in synonyms_dict["right"]:
+            directions.append(word.lower())
+
+    return directions
 
 def extract_numbers(prefix, variables):
     numbers = []
@@ -278,7 +315,7 @@ def match_expression(expression_to_match, speech, context=None): # returns tuple
 
         # tracks where similar word occurs in speech
         match_found = False
-        max_bound = speech_pointer+5
+        max_bound = speech_pointer+7
         if speech_pointer == -1: max_bound = len(words_in_speech)
         if speech_pointer <= len(words_in_speech)-1:
             for j in range(min(speech_pointer+1, len(words_in_speech)-1), min(max_bound, len(words_in_speech))):
@@ -314,13 +351,17 @@ def match_expression(expression_to_match, speech, context=None): # returns tuple
                     
             break
 
+    # extracts colors
+    colors = extract_colors(variables)
+    variables += colors
+
     # extracts numbers
     numbers = extract_numbers(prefix, variables)
     variables += numbers
 
-    # extracts colors
-    colors = extract_colors(variables)
-    variables += colors
+    # extracts directions
+    directions = extract_directions(prefix)
+    variables += directions
 
     return [prefix, variables, next_phrase]
 
@@ -349,3 +390,7 @@ def match_expression(expression_to_match, speech, context=None): # returns tuple
 # print(match_expression("(make,set) title","change the title color to white"))
 # print(match_expression("(make,set) title","change the title color to blue"))
 # print(match_expression("(make,set) (logo,title) background", "make the title background red"))
+# print(match_expression("(make,set) title (to,say)", "make the title say red title"))
+# print(match_expression("(make,set) title", "make the title say red title"))
+# print(match_expression("(make,set) (logo,title) background", "make the left side of the logo background red"))
+

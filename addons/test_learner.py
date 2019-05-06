@@ -23,8 +23,8 @@ samples = [
     [Datapoint({"text": "please just reload the page"}), Datapoint({"text": "r"})],
 ]
 
-learning_rate = 2e-8
-interpreter = Learner(60, 40, learning_rate, samples)
+learning_rate = 4e-9
+interpreter = Learner(60, 50, learning_rate, samples)
 
 interpreter.train_network(10000)
 Datapoint({}, [], [interpreter.test_network( Datapoint({"text": "set the title to my website"}).reduce() )]).print()

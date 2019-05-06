@@ -100,6 +100,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# custom
 .modifications
 .swiftpage_commands
 dev_server.html
+*.icloud
