@@ -81,6 +81,16 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     self.page.sections = self.page.sections[:logo_row[1]]+self.page.sections[logo_row[1]+1:]
+            if "add_navbar" in mod:
+                index = int(mod[11:])
+                self.page.sections.insert(index, NavBar({
+                    "unknown": {"address": "#"},
+                }))
+            if "remove_navbar" in mod:
+                number = int(mod[14:])
+                navbar = self.page.get_component("navbar", number)
+                if navbar != None:
+                    self.page.sections = self.page.sections[:navbar[1]]+self.page.sections[navbar[1]+1:]
 
         return self.page
 

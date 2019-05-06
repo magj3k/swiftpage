@@ -59,6 +59,15 @@ class SpeechControlAddon(Addon):
                     self.queued_modifications.append("remove_logo")
                     match = match_any_expression(["delete logo"], recognized_speech)
                     self.reset_context()
+                elif match_any_expression(["remove navbar"], recognized_speech) != None:
+                    number = 1
+                    for variable in match[1]:
+                        if isinstance(variable, int):
+                            number = variable
+                            break
+                    match = match_any_expression(["remove navbar"], recognized_speech)
+                    self.reset_context()
+                    self.queued_modifications.append("remove_navbar "+str(number))
                 elif match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech) != None:
                     self.queued_modifications.append("remove_logo_bg")
                     match = match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech)
@@ -159,6 +168,13 @@ class SpeechControlAddon(Addon):
                     self.queued_modifications.append("add_logo")
                     match = match_any_expression(["add logo"], recognized_speech)
                     self.context["object"] = "title"
+                elif match_any_expression(["add navbar"], recognized_speech) != None:
+                    match = match_any_expression(["add navbar"], recognized_speech)
+
+                    index = 1
+                    # TODO: modify index based on propositions
+                    self.queued_modifications.append("add_navbar "+str(index))
+                    self.context["object"] = "title "+str(index)
 
                 # processes additional commands
                 recognized_speech = None
