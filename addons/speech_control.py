@@ -4,6 +4,7 @@ import sys
 sys.path.append('./addons')
 from addon import *
 from speech_helper import *
+from util.elements import *
 import speech_recognition as sr # also implicity requires pyaudio
 
 class SpeechControlAddon(Addon):
@@ -63,6 +64,10 @@ class SpeechControlAddon(Addon):
                         break
                 self.reset_context()
                 self.queued_modifications.append("remove_navbar "+str(number))
+            elif match_any_expression(["delete footer"], recognized_speech) != None:
+                self.queued_modifications.append("remove_footer")
+                match = match_any_expression(["delete footer"], recognized_speech)
+                self.reset_context()
             elif match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech) != None:
                 self.queued_modifications.append("remove_logo_bg")
                 match = match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech)
@@ -75,6 +80,38 @@ class SpeechControlAddon(Addon):
                 self.queued_modifications.append("restore_logo_bg")
                 match = match_any_expression(["restore logo (text,round) background", "logo (text,round) background on"], recognized_speech)
                 self.context["object"] = "logo text background"
+            elif match_any_expression(["footer background match logo background"], recognized_speech) != None: # constructive modification commands last
+                match = match_any_expression(["footer background match logo background"], recognized_speech)
+                self.context["object"] = "footer"
+
+                footer_ref = self.get_current_page().get_component("footer")
+                logo_ref = self.get_current_page().get_component("logo")
+                if footer_ref != None and logo_ref != None:
+                    colors_string = ""
+                    if len(logo_ref[0].metadata["background-colors"]) > 0:
+                        for i in range(len(logo_ref[0].metadata["background-colors"])):
+                            colors_string += logo_ref[0].metadata["background-colors"][i].strip("\n")
+                            if i < len(logo_ref[0].metadata["background-colors"])-1:
+                                colors_string += " "
+                    else:
+                        colors_string = "#ffffff"
+                    self.queued_modifications.append("footer_match_bg "+colors_string)
+            elif match_any_expression(["logo background match footer background"], recognized_speech) != None: # constructive modification commands last
+                match = match_any_expression(["logo background match footer background"], recognized_speech)
+                self.context["object"] = "logo"
+
+                footer_ref = self.get_current_page().get_component("footer")
+                logo_ref = self.get_current_page().get_component("logo")
+                if footer_ref != None and logo_ref != None:
+                    colors_string = ""
+                    if len(footer_ref[0].metadata["background-colors"]) > 0:
+                        for i in range(len(footer_ref[0].metadata["background-colors"])):
+                            colors_string += footer_ref[0].metadata["background-colors"][i].strip("\n")
+                            if i < len(footer_ref[0].metadata["background-colors"])-1:
+                                colors_string += " "
+                    else:
+                        colors_string = "#ffffff"
+                    self.queued_modifications.append("logo_match_bg "+colors_string)
             elif match_any_expression(["(make,set) (logo,title) (text,round) background"], recognized_speech) != None and len(match_any_expression(["(make,set) (logo,title) (text,round) background"], recognized_speech)[1]) > 0:
                 match = match_any_expression(["(make,set) (logo,title) (text,round) background"], recognized_speech)
                 self.context["object"] = "logo text background"
@@ -91,7 +128,7 @@ class SpeechControlAddon(Addon):
                         color = merge_colors_hex(color, ref[0].metadata["rounded-color"])
                 if color != None:
                     self.queued_modifications.append("title_text_bg_to "+color)
-            elif match_any_expression(["(make,set) (logo,title) background"], recognized_speech) != None and len(match_any_expression(["(make,set) (logo,title) background"], recognized_speech)[1]) > 0: # constructive modification commands last
+            elif match_any_expression(["(make,set) (logo,title) background"], recognized_speech) != None and len(match_any_expression(["(make,set) (logo,title) background"], recognized_speech)[1]) > 0:
                 match = match_any_expression(["(make,set) (logo,title) background"], recognized_speech)
                 self.context["object"] = "logo background"
                 color = None
@@ -144,7 +181,7 @@ class SpeechControlAddon(Addon):
                     self.queued_modifications.append("title_color_to "+color)
             elif match_expression("(make,set) title (to,say)", recognized_speech) != None and len(match_expression("(make,set) title (to,say)", recognized_speech)[1]) > 0:
                 match = match_expression("(make,set) title (to,say)", recognized_speech)
-                self.context["object"] = "text"
+                self.context["object"] = "title"
                 title = match[1][0].title()
                 self.queued_modifications.append("title_to "+title)
             elif match_expression("(make,set) title", recognized_speech) != None and len(match_expression("(make,set) title", recognized_speech)[1]) > 0:
@@ -171,7 +208,6 @@ class SpeechControlAddon(Addon):
                 match = match_any_expression(["add navbar"], recognized_speech)
                 current_page = self.get_current_page()
 
-                # TODO: needs work
                 index = 1
                 proposition = None
                 for variable in match[1]:
@@ -188,7 +224,83 @@ class SpeechControlAddon(Addon):
                 if proposition == "below" and len(current_page.sections) > index and isinstance(current_page.sections[index], NavBar):
                     index += 1
                 self.queued_modifications.append("add_navbar "+str(index))
-                self.context["object"] = "title "+str(index)
+                self.context["object"] = "navbar "+str(index)
+            elif match_any_expression(["add footer"], recognized_speech) != None:
+                self.queued_modifications.append("add_footer")
+                match = match_any_expression(["add footer"], recognized_speech)
+                self.context["object"] = "footer"
+            elif match_any_expression(["(make,set) footer background"], recognized_speech) != None and len(match_any_expression(["(make,set) footer background"], recognized_speech)[1]) > 0:
+                match = match_any_expression(["(make,set) footer background"], recognized_speech)
+                self.context["object"] = "footer background"
+                color = None
+                direction = None
+                color_needs_merge = False
+                for variable in match[1]:
+                    if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
+                        color = variable
+                    if direction == None and len(variable) > 1 and variable in synonyms_dict["left"]: # indicates a left direction
+                        direction = "left"
+                    if direction == None and len(variable) > 1 and variable in synonyms_dict["right"]: # indicates a right direction
+                        direction = "right"
+                    if variable == "colorneedsmerge":
+                        color_needs_merge = True
+
+                if color != None:
+                    # merges color with reference if possible & necessary
+                    ref = self.get_current_page().get_component("footer")
+                    if color_needs_merge == True and ref != None:
+                        if direction == "left":
+                            color = merge_colors_hex(color, ref[0].metadata["background-colors"][0])
+                        elif direction == "right":
+                            if len(ref[0].metadata["background-colors"]) > 1:
+                                color = merge_colors_hex(color, ref[0].metadata["background-colors"][1])
+                            else:
+                                color = merge_colors_hex(color, ref[0].metadata["background-colors"][0])
+                        else:
+                            color = merge_colors_hex(color, ref[0].metadata["background-colors"][0])
+
+                    # sets new color
+                    if direction != None:
+                        self.queued_modifications.append("footer_bg_"+direction+"_to "+color)
+                    else:
+                        self.queued_modifications.append("footer_bg_to "+color)
+            elif match_expression("(make,set) footer color", recognized_speech) != None and len(match_expression("(make,set) footer color", recognized_speech)[1]) > 0:
+                match = match_expression("(make,set) footer color", recognized_speech)
+                self.context["object"] = "footer"
+                color = None
+                color_needs_merge = (len(match[1]) > 0 and "colorneedsmerge" in match[1])
+                for variable in match[1]:
+                    if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
+                        color = variable
+                        break
+
+                if color_needs_merge == True:
+                    ref = self.get_current_page().get_component("footer")
+                    if ref != None:
+                        color = merge_colors_hex(color, ref[0].metadata["text-color"])
+                if color != None:
+                    self.queued_modifications.append("footer_color_to "+color)
+            elif match_expression("(make,set) footer (to,say)", recognized_speech) != None and len(match_expression("(make,set) footer (to,say)", recognized_speech)[1]) > 0:
+                match = match_expression("(make,set) footer (to,say)", recognized_speech)
+                self.context["object"] = "footer"
+                title = match[1][0].title()
+                self.queued_modifications.append("footer_to "+title)
+            elif match_expression("(make,set) footer", recognized_speech) != None and len(match_expression("(make,set) footer", recognized_speech)[1]) > 0:
+                match = match_expression("(make,set) footer", recognized_speech)
+                self.context["object"] = "footer"
+                color = None
+                color_needs_merge = (len(match[1]) > 0 and "colorneedsmerge" in match[1])
+                for variable in match[1]:
+                    if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
+                        color = variable
+                        break
+
+                if color_needs_merge == True:
+                    ref = self.get_current_page().get_component("footer")
+                    if ref != None:
+                        color = merge_colors_hex(color, ref[0].metadata["text-color"])
+                if color != None:
+                    self.queued_modifications.append("footer_color_to "+color)
 
             # processes additional commands
             recognized_speech = None

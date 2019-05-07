@@ -30,46 +30,50 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     logo_row[0].metadata["text"] = title
-            if "remove_logo_bg" in mod:
+            elif "remove_logo_bg" in mod:
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     logo_row[0].metadata["rounded"] = "false"
-            if "restore_logo_bg" in mod:
+            elif "remove_logo" in mod:
+                logo_row = self.page.get_component("logo")
+                if logo_row != None:
+                    self.page.sections = self.page.sections[:logo_row[1]]+self.page.sections[logo_row[1]+1:]
+            elif "restore_logo_bg" in mod:
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     logo_row[0].metadata["rounded"] = "true"
-            if "title_color_to" in mod:
+            elif "title_color_to" in mod:
                 color = mod[15:]
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     logo_row[0].metadata["text-color"] = color
-            if "title_bg_to" in mod:
+            elif "title_bg_to" in mod:
                 color = mod[12:]
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     logo_row[0].metadata["background-colors"] = [color]
-            if "title_bg_left_to" in mod:
+            elif "title_bg_left_to" in mod:
                 color = mod[17:]
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     if len(logo_row[0].metadata["background-colors"]) == 1:
                         logo_row[0].metadata["background-colors"].append(logo_row[0].metadata["background-colors"][0])
                     logo_row[0].metadata["background-colors"][0] = color
-            if "title_bg_right_to" in mod:
+            elif "title_bg_right_to" in mod:
                 color = mod[18:]
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     if len(logo_row[0].metadata["background-colors"]) == 1:
                         logo_row[0].metadata["background-colors"].append(logo_row[0].metadata["background-colors"][0])
                     logo_row[0].metadata["background-colors"][1] = color
-            if "title_text_bg_to" in mod:
+            elif "title_text_bg_to" in mod:
                 color = mod[17:]
                 logo_row = self.page.get_component("logo")
                 if logo_row != None:
                     logo_row[0].metadata["rounded-color"] = color
-            if "whiteout_all_all" in mod:
+            elif "whiteout_all" in mod:
                 self.page.sections = []
-            if "add_logo" in mod:
+            elif "add_logo" in mod:
                 logo_row = self.page.get_component("logo")
                 if logo_row == None:
                     self.page.sections.insert(0, Row("logo", {
@@ -77,16 +81,71 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
                         "rounded": "true",
                         "background-colors": ["#f06d55", "#1a32d5"],
                     }))
-            if "remove_logo" in mod:
-                logo_row = self.page.get_component("logo")
-                if logo_row != None:
-                    self.page.sections = self.page.sections[:logo_row[1]]+self.page.sections[logo_row[1]+1:]
-            if "add_navbar" in mod:
+            elif "add_footer" in mod:
+                footer_row = self.page.get_component("footer")
+                if footer_row == None:
+                    self.page.sections.append(
+                        Row("footer", {})
+                    )
+            elif "remove_footer" in mod:
+                footer_row = self.page.get_component("footer")
+                if footer_row != None:
+                    self.page.sections = self.page.sections[:footer_row[1]]+self.page.sections[footer_row[1]+1:]
+            elif "footer_color_to" in mod:
+                color = mod[16:]
+                footer_row = self.page.get_component("footer")
+                if footer_row != None:
+                    footer_row[0].metadata["text-color"] = color
+            elif "footer_bg_to" in mod:
+                color = mod[13:]
+                footer_row = self.page.get_component("footer")
+                if footer_row != None:
+                    footer_row[0].metadata["background-colors"] = [color]
+            elif "footer_bg_left_to" in mod:
+                color = mod[18:]
+                footer_row = self.page.get_component("footer")
+                if footer_row != None:
+                    if len(footer_row[0].metadata["background-colors"]) == 1:
+                        footer_row[0].metadata["background-colors"].append(footer_row[0].metadata["background-colors"][0])
+                    footer_row[0].metadata["background-colors"][0] = color
+            elif "footer_bg_right_to" in mod:
+                color = mod[19:]
+                footer_row = self.page.get_component("footer")
+                if footer_row != None:
+                    if len(footer_row[0].metadata["background-colors"]) == 1:
+                        footer_row[0].metadata["background-colors"].append(footer_row[0].metadata["background-colors"][0])
+                    footer_row[0].metadata["background-colors"][1] = color
+            elif "footer_match_bg" in mod:
+                colors = []
+                if len(mod) > 18: # extract first color
+                    colors.append(mod[16:23])
+                if len(mod) > 25: # extract second color
+                    colors.append(mod[24:])
+
+                if len(colors) > 0:
+                    footer_row = self.page.get_component("footer")
+                    if footer_row != None:
+                        footer_row[0].metadata["background-colors"] = colors
+            elif "logo_match_bg" in mod:
+                colors = []
+                if len(mod) > 16: # extract first color
+                    colors.append(mod[14:21])
+                if len(mod) > 23: # extract second color
+                    colors.append(mod[22:])
+
+                if len(colors) > 0:
+                    logo_row = self.page.get_component("logo")
+                    if logo_row != None:
+                        logo_row[0].metadata["background-colors"] = colors
+            elif "add_navbar" in mod:
                 index = int(mod[11:])
                 self.page.sections.insert(index, NavBar({
-                    "unknown": {"address": "#"},
+                    "facebook": {"address": "#"},
+                    "soundcloud": {"address": "#"},
+                    "linkedin": {"address": "#", "color": "#0a4767"},
+                    # "unknown": {"address": "#"},
                 }))
-            if "remove_navbar" in mod:
+            elif "remove_navbar" in mod:
                 number = int(mod[14:])
                 navbar = self.page.get_component("navbar", number)
                 if navbar != None:

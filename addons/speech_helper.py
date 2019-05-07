@@ -14,6 +14,7 @@ synonyms = [
     ["next", "after"],
     ["above", "top", "before"],
     ["below", "underneath", "under"],
+    ["same", "match", "identical", "equal", "similar"],
     ["gradient", "shade", "colorshift", "transition"],
     ["like", "similar", "around"],
     ["and", "also", "then"],
@@ -70,6 +71,7 @@ synonyms = [
     ["hashtag", "pound"],
     ["again", "over"],
     ["round", "rounded", "curved"],
+    ["footer", "credits", "acknowledgements", "copyright", "disclaimer"],
 ]
 for synonyms_list in synonyms:
     for synonym in synonyms_list:
@@ -258,11 +260,14 @@ def match_any_expression(expressions_to_match, speech, context=None):
             return match
     return None
 
-def extract_directions(prefix):
-    words_in_prefix = prefix.split(' ')
+def extract_directions(prefix, variables):
+    words_to_consider = prefix.split(' ')
+    for variable in variables:
+        words_to_consider += variable.split(' ')
+
     directions = []
-    for word in words_in_prefix:
-        if word.lower() in synonyms_dict["left"] or word.lower() in synonyms_dict["right"]:
+    for word in words_to_consider:
+        if word.lower() in synonyms_dict["left"] or word.lower() in synonyms_dict["right"] or word.lower() in synonyms_dict["above"] or word.lower() in synonyms_dict["below"] or word.lower() in synonyms_dict["before"] or word.lower() in synonyms_dict["after"]:
             directions.append(word.lower())
 
     return directions
@@ -357,13 +362,13 @@ def match_expression(expression_to_match, speech, context=None): # returns tuple
     colors = extract_colors(variables)
     variables += colors
 
+    # extracts directions
+    directions = extract_directions(prefix, variables)
+    variables += directions
+
     # extracts numbers
     numbers = extract_numbers(prefix, variables)
     variables += numbers
-
-    # extracts directions
-    directions = extract_directions(prefix)
-    variables += directions
 
     return [prefix, variables, next_phrase]
 
@@ -395,4 +400,7 @@ def match_expression(expression_to_match, speech, context=None): # returns tuple
 # print(match_expression("(make,set) title (to,say)", "make the title say red title"))
 # print(match_expression("(make,set) title", "make the title say red title"))
 # print(match_expression("(make,set) (logo,title) background", "make the left side of the logo background red"))
+# print(match_expression("add navbar", "add a new navbar below the first one"))
+# print(match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], "remove the logo text background"))
+# print(match_expression("delete logo", "remove the logo text background"))
 
