@@ -54,10 +54,6 @@ class SpeechControlAddon(Addon):
                 self.queued_modifications.append("whiteout_all")
                 match = match_any_expression(["clear everything", "start new"], recognized_speech)
                 self.reset_context()
-            elif match_any_expression(["delete logo"], recognized_speech) != None:
-                self.queued_modifications.append("remove_logo")
-                match = match_any_expression(["delete logo"], recognized_speech)
-                self.reset_context()
             elif match_any_expression(["remove navbar"], recognized_speech) != None:
                 number = 1
                 match = match_any_expression(["remove navbar"], recognized_speech)
@@ -71,6 +67,10 @@ class SpeechControlAddon(Addon):
                 self.queued_modifications.append("remove_logo_bg")
                 match = match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech)
                 self.context["object"] = "logo text background"
+            elif match_any_expression(["delete logo"], recognized_speech) != None:
+                self.queued_modifications.append("remove_logo")
+                match = match_any_expression(["delete logo"], recognized_speech)
+                self.reset_context()
             elif match_any_expression(["restore logo (text,round) background", "logo (text,round) background on"], recognized_speech) != None:
                 self.queued_modifications.append("restore_logo_bg")
                 match = match_any_expression(["restore logo (text,round) background", "logo (text,round) background on"], recognized_speech)
@@ -169,9 +169,24 @@ class SpeechControlAddon(Addon):
                 self.context["object"] = "title"
             elif match_any_expression(["add navbar"], recognized_speech) != None:
                 match = match_any_expression(["add navbar"], recognized_speech)
+                current_page = self.get_current_page()
 
+                # TODO: needs work
                 index = 1
-                # TODO: modify index based on propositions
+                proposition = None
+                for variable in match[1]:
+                    if isinstance(variable, int):
+                        # looks up index of numberth navbar
+                        number = variable
+                        ref = current_page.get_component("navbar", number)
+                        if ref != None:
+                            index = ref[1]
+                    if proposition == None and (variable in synonyms_dict["above"] or variable in synonyms_dict["before"]):
+                        proposition = "above"
+                    elif proposition == None and (variable in synonyms_dict["below"] or variable in synonyms_dict["after"]):
+                        proposition = "below"
+                if proposition == "below" and len(current_page.sections) > index and isinstance(current_page.sections[index], NavBar):
+                    index += 1
                 self.queued_modifications.append("add_navbar "+str(index))
                 self.context["object"] = "title "+str(index)
 

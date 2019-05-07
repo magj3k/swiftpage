@@ -12,6 +12,8 @@ synonyms = [
     ["title", "logo", "header", "beginning"],
     ["color", "shade"],
     ["next", "after"],
+    ["above", "top", "before"],
+    ["below", "underneath", "under"],
     ["gradient", "shade", "colorshift", "transition"],
     ["like", "similar", "around"],
     ["and", "also", "then"],
