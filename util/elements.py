@@ -135,7 +135,7 @@ class Page(object):
                 print("WARNING: "+issue)
 
     def render(self):
-        html_prefix = "<!DOCTYPE html>\n<html>\n<head>\n<link rel='shortcut icon' href='images/favicon.ico'>\n<link type='text/css' rel='stylesheet' href='main.css' media='screen'>\n<meta charset='utf-8'>\n<meta name='viewport' content='width=device-width'>\n<title>"+self.title+"</title>\n</head>\n<body>\n"
+        html_prefix = "<!DOCTYPE html>\n<html>\n<head>\n<link rel='shortcut icon' href='images/favicon.ico'>\n<link type='text/css' rel='stylesheet' href='main.css' media='screen'>\n<meta charset='utf-8'>\n<meta name='viewport' content='width=800, initial-scale=1'>\n<title>"+self.title+"</title>\n</head>\n<body>\n"
         html_suffix = "</body>\n</html>\n"
 
         separator_row = Row("", { "color": self.separator_color })
