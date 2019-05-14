@@ -81,6 +81,15 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
                         "rounded": "true",
                         "background-colors": ["#f06d55", "#1a32d5"],
                     }))
+            elif "footer_to" in mod:
+                text = mod[10:]
+                footer_row = self.page.get_component("footer")
+                if footer_row != None:
+                    footer_row[0].metadata["text"] = text
+            elif "reset_footer" in mod:
+                footer_row = self.page.get_component("footer")
+                if footer_row != None:
+                    footer_row[0].metadata["text"] = ""
             elif "add_footer" in mod:
                 footer_row = self.page.get_component("footer")
                 if footer_row == None:

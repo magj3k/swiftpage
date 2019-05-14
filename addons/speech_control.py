@@ -20,6 +20,7 @@ class SpeechControlAddon(Addon):
 
         self.context = {}
         self.reset_context()
+        self.current_match = None
 
     def get_current_page(self):
         return self.modifier.generate()
@@ -32,58 +33,66 @@ class SpeechControlAddon(Addon):
             "color": None,
         }
 
+    def process_match(self, target_phrases, recognized_speech, min_required_variables=0):
+        if self.current_match == None:
+            self.current_match = match_any_expression(target_phrases, recognized_speech, min_required_variables)
+            return self.current_match != None
+        return False
+
     def process_statement(self, recognized_speech):
         while recognized_speech != None:
-            match = None
+            self.current_match = None
             recognized_speech = extract_context(recognized_speech, self.context)
             print("Speech: " + recognized_speech)
 
-            if match_expression("refresh", recognized_speech) != None: # server commands first
-                self.server_commands.append("refresh")
-                match = match_expression("refresh", recognized_speech)
-            elif match_expression("scroll to bottom", recognized_speech) != None:
+            # all supported phrases and their corresponding actions
+
+            # server commands first
+            if self.process_match(["refresh"], recognized_speech):
+               self.server_commands.append("refresh")
+               
+            if self.process_match(["scroll to bottom"], recognized_speech):
                 self.server_commands.append("scroll_to_bottom")
-                match = match_expression("scroll to bottom", recognized_speech)
-            elif match_expression("scroll to top", recognized_speech) != None:
+
+            if self.process_match(["scroll to top"], recognized_speech):
                 self.server_commands.append("scroll_to_top")
-                match = match_expression("scroll to top", recognized_speech)
-            elif match_any_expression(["reset changes", "clear edits"], recognized_speech) != None: # destructive modification commands next
+
+            # destructive modification commands next
+            if self.process_match(["reset changes", "clear edits"], recognized_speech):
                 self.queued_modifications.append("clear")
-                match = match_any_expression(["reset changes", "clear edits"], recognized_speech)
                 self.reset_context()
-            elif match_any_expression(["clear everything", "start new"], recognized_speech) != None:
+
+            if self.process_match(["clear everything", "start new"], recognized_speech):
                 self.queued_modifications.append("whiteout_all")
-                match = match_any_expression(["clear everything", "start new"], recognized_speech)
                 self.reset_context()
-            elif match_any_expression(["remove navbar"], recognized_speech) != None:
+
+            if self.process_match(["remove navbar"], recognized_speech):
                 number = 1
-                match = match_any_expression(["remove navbar"], recognized_speech)
-                for variable in match[1]:
+                for variable in self.current_match[1]:
                     if isinstance(variable, int):
                         number = variable
                         break
                 self.reset_context()
                 self.queued_modifications.append("remove_navbar "+str(number))
-            elif match_any_expression(["delete footer"], recognized_speech) != None:
-                self.queued_modifications.append("remove_footer")
-                match = match_any_expression(["delete footer"], recognized_speech)
-                self.reset_context()
-            elif match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech) != None:
-                self.queued_modifications.append("remove_logo_bg")
-                match = match_any_expression(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech)
-                self.context["object"] = "logo text background"
-            elif match_any_expression(["delete logo"], recognized_speech) != None:
-                self.queued_modifications.append("remove_logo")
-                match = match_any_expression(["delete logo"], recognized_speech)
-                self.reset_context()
-            elif match_any_expression(["restore logo (text,round) background", "logo (text,round) background on"], recognized_speech) != None:
-                self.queued_modifications.append("restore_logo_bg")
-                match = match_any_expression(["restore logo (text,round) background", "logo (text,round) background on"], recognized_speech)
-                self.context["object"] = "logo text background"
-            elif match_any_expression(["footer background match logo background"], recognized_speech) != None: # constructive modification commands last
-                match = match_any_expression(["footer background match logo background"], recognized_speech)
-                self.context["object"] = "footer"
 
+            if self.process_match(["delete footer"], recognized_speech):
+                self.queued_modifications.append("remove_footer")
+                self.reset_context()
+
+            if self.process_match(["delete logo (text,round) background", "logo (text,round) background off"], recognized_speech):
+                self.queued_modifications.append("remove_logo_bg")
+                self.context["object"] = "logo text background"
+
+            if self.process_match(["delete logo"], recognized_speech):
+                self.queued_modifications.append("remove_logo")
+                self.reset_context()
+
+            if self.process_match(["restore logo (text,round) background", "logo (text,round) background on"], recognized_speech):
+                self.queued_modifications.append("restore_logo_bg")
+                self.context["object"] = "logo text background"
+
+            if self.process_match(["footer background match logo background"], recognized_speech):
+                self.context["object"] = "footer"
                 footer_ref = self.get_current_page().get_component("footer")
                 logo_ref = self.get_current_page().get_component("logo")
                 if footer_ref != None and logo_ref != None:
@@ -96,10 +105,9 @@ class SpeechControlAddon(Addon):
                     else:
                         colors_string = "#ffffff"
                     self.queued_modifications.append("footer_match_bg "+colors_string)
-            elif match_any_expression(["logo background match footer background"], recognized_speech) != None: # constructive modification commands last
-                match = match_any_expression(["logo background match footer background"], recognized_speech)
-                self.context["object"] = "logo"
 
+            if self.process_match(["logo background match footer background"], recognized_speech):
+                self.context["object"] = "logo"
                 footer_ref = self.get_current_page().get_component("footer")
                 logo_ref = self.get_current_page().get_component("logo")
                 if footer_ref != None and logo_ref != None:
@@ -112,12 +120,12 @@ class SpeechControlAddon(Addon):
                     else:
                         colors_string = "#ffffff"
                     self.queued_modifications.append("logo_match_bg "+colors_string)
-            elif match_any_expression(["(make,set) (logo,title) (text,round) background"], recognized_speech) != None and len(match_any_expression(["(make,set) (logo,title) (text,round) background"], recognized_speech)[1]) > 0:
-                match = match_any_expression(["(make,set) (logo,title) (text,round) background"], recognized_speech)
+
+            if self.process_match(["(make,set) (logo,title) (text,round) background"], recognized_speech, 1):
                 self.context["object"] = "logo text background"
                 color = None
-                color_needs_merge = (len(match[1]) > 0 and "colorneedsmerge" in match[1])
-                for variable in match[1]:
+                color_needs_merge = (len(self.current_match[1]) > 0 and "colorneedsmerge" in self.current_match[1])
+                for variable in self.current_match[1]:
                     if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
                         color = variable
                         break
@@ -128,13 +136,13 @@ class SpeechControlAddon(Addon):
                         color = merge_colors_hex(color, ref[0].metadata["rounded-color"])
                 if color != None:
                     self.queued_modifications.append("title_text_bg_to "+color)
-            elif match_any_expression(["(make,set) (logo,title) background"], recognized_speech) != None and len(match_any_expression(["(make,set) (logo,title) background"], recognized_speech)[1]) > 0:
-                match = match_any_expression(["(make,set) (logo,title) background"], recognized_speech)
+
+            if self.process_match(["(make,set) (logo,title) background"], recognized_speech, 1):
                 self.context["object"] = "logo background"
                 color = None
                 direction = None
                 color_needs_merge = False
-                for variable in match[1]:
+                for variable in self.current_match[1]:
                     if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
                         color = variable
                     if direction == None and len(variable) > 1 and variable in synonyms_dict["left"]: # indicates a left direction
@@ -163,12 +171,12 @@ class SpeechControlAddon(Addon):
                         self.queued_modifications.append("title_bg_"+direction+"_to "+color)
                     else:
                         self.queued_modifications.append("title_bg_to "+color)
-            elif match_expression("(make,set) title color", recognized_speech) != None and len(match_expression("(make,set) title color", recognized_speech)[1]) > 0:
-                match = match_expression("(make,set) title color", recognized_speech)
+
+            if self.process_match(["(make,set) title color"], recognized_speech, 1):
                 self.context["object"] = "title"
                 color = None
-                color_needs_merge = (len(match[1]) > 0 and "colorneedsmerge" in match[1])
-                for variable in match[1]:
+                color_needs_merge = (len(self.current_match[1]) > 0 and "colorneedsmerge" in self.current_match[1])
+                for variable in self.current_match[1]:
                     if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
                         color = variable
                         break
@@ -179,17 +187,17 @@ class SpeechControlAddon(Addon):
                         color = merge_colors_hex(color, ref[0].metadata["text-color"])
                 if color != None:
                     self.queued_modifications.append("title_color_to "+color)
-            elif match_expression("(make,set) title (to,say)", recognized_speech) != None and len(match_expression("(make,set) title (to,say)", recognized_speech)[1]) > 0:
-                match = match_expression("(make,set) title (to,say)", recognized_speech)
+
+            if self.process_match(["(make,set) title (to,say)"], recognized_speech, 1):
                 self.context["object"] = "title"
-                title = match[1][0].title()
+                title = self.current_match[1][0].title()
                 self.queued_modifications.append("title_to "+title)
-            elif match_expression("(make,set) title", recognized_speech) != None and len(match_expression("(make,set) title", recognized_speech)[1]) > 0:
-                match = match_expression("(make,set) title", recognized_speech)
+
+            if self.process_match(["(make,set) title"], recognized_speech, 1):
                 self.context["object"] = "title"
                 color = None
-                color_needs_merge = (len(match[1]) > 0 and "colorneedsmerge" in match[1])
-                for variable in match[1]:
+                color_needs_merge = (len(self.current_match[1]) > 0 and "colorneedsmerge" in self.current_match[1])
+                for variable in self.current_match[1]:
                     if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
                         color = variable
                         break
@@ -200,17 +208,16 @@ class SpeechControlAddon(Addon):
                         color = merge_colors_hex(color, ref[0].metadata["text-color"])
                 if color != None:
                     self.queued_modifications.append("title_color_to "+color)
-            elif match_any_expression(["add logo"], recognized_speech) != None:
-                self.queued_modifications.append("add_logo")
-                match = match_any_expression(["add logo"], recognized_speech)
-                self.context["object"] = "title"
-            elif match_any_expression(["add navbar"], recognized_speech) != None:
-                match = match_any_expression(["add navbar"], recognized_speech)
-                current_page = self.get_current_page()
 
+            if self.process_match(["add logo"], recognized_speech):
+                self.queued_modifications.append("add_logo")
+                self.context["object"] = "title"
+
+            if self.process_match(["add navbar"], recognized_speech, 1):
+                current_page = self.get_current_page()
                 index = 1
                 proposition = None
-                for variable in match[1]:
+                for variable in self.current_match[1]:
                     if isinstance(variable, int):
                         # looks up index of numberth navbar
                         number = variable
@@ -225,17 +232,17 @@ class SpeechControlAddon(Addon):
                     index += 1
                 self.queued_modifications.append("add_navbar "+str(index))
                 self.context["object"] = "navbar "+str(index)
-            elif match_any_expression(["add footer"], recognized_speech) != None:
+
+            if self.process_match(["add footer"], recognized_speech):
                 self.queued_modifications.append("add_footer")
-                match = match_any_expression(["add footer"], recognized_speech)
                 self.context["object"] = "footer"
-            elif match_any_expression(["(make,set) footer background"], recognized_speech) != None and len(match_any_expression(["(make,set) footer background"], recognized_speech)[1]) > 0:
-                match = match_any_expression(["(make,set) footer background"], recognized_speech)
+
+            if self.process_match(["(make,set) footer background"], recognized_speech, 1):
                 self.context["object"] = "footer background"
                 color = None
                 direction = None
                 color_needs_merge = False
-                for variable in match[1]:
+                for variable in self.current_match[1]:
                     if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
                         color = variable
                     if direction == None and len(variable) > 1 and variable in synonyms_dict["left"]: # indicates a left direction
@@ -264,12 +271,12 @@ class SpeechControlAddon(Addon):
                         self.queued_modifications.append("footer_bg_"+direction+"_to "+color)
                     else:
                         self.queued_modifications.append("footer_bg_to "+color)
-            elif match_expression("(make,set) footer color", recognized_speech) != None and len(match_expression("(make,set) footer color", recognized_speech)[1]) > 0:
-                match = match_expression("(make,set) footer color", recognized_speech)
+
+            if self.process_match(["(make,set) footer color"], recognized_speech, 1):
                 self.context["object"] = "footer"
                 color = None
-                color_needs_merge = (len(match[1]) > 0 and "colorneedsmerge" in match[1])
-                for variable in match[1]:
+                color_needs_merge = (len(self.current_match[1]) > 0 and "colorneedsmerge" in self.current_match[1])
+                for variable in self.current_match[1]:
                     if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
                         color = variable
                         break
@@ -280,17 +287,17 @@ class SpeechControlAddon(Addon):
                         color = merge_colors_hex(color, ref[0].metadata["text-color"])
                 if color != None:
                     self.queued_modifications.append("footer_color_to "+color)
-            elif match_expression("(make,set) footer (to,say)", recognized_speech) != None and len(match_expression("(make,set) footer (to,say)", recognized_speech)[1]) > 0:
-                match = match_expression("(make,set) footer (to,say)", recognized_speech)
+
+            if self.process_match(["(make,set) footer (to,say)"], recognized_speech, 1):
                 self.context["object"] = "footer"
-                title = match[1][0].title()
+                title = self.current_match[1][0].title()
                 self.queued_modifications.append("footer_to "+title)
-            elif match_expression("(make,set) footer", recognized_speech) != None and len(match_expression("(make,set) footer", recognized_speech)[1]) > 0:
-                match = match_expression("(make,set) footer", recognized_speech)
+
+            if self.process_match(["(make,set) footer"], recognized_speech, 1):
                 self.context["object"] = "footer"
                 color = None
-                color_needs_merge = (len(match[1]) > 0 and "colorneedsmerge" in match[1])
-                for variable in match[1]:
+                color_needs_merge = (len(self.current_match[1]) > 0 and "colorneedsmerge" in self.current_match[1])
+                for variable in self.current_match[1]:
                     if color == None and len(variable) > 1 and variable[0] == "#": # indicates a color
                         color = variable
                         break
@@ -301,13 +308,17 @@ class SpeechControlAddon(Addon):
                         color = merge_colors_hex(color, ref[0].metadata["text-color"])
                 if color != None:
                     self.queued_modifications.append("footer_color_to "+color)
+
+            if self.process_match(["reset footer"], recognized_speech):
+                self.queued_modifications.append("reset_footer")
+                self.context["object"] = "footer"
 
             # processes additional commands
             recognized_speech = None
-            if match != None:
-                print("Speech interpretation: "+str(match))
-                if match[2] != None:
-                    recognized_speech = match[2]
+            if self.current_match != None:
+                print("Speech interpretation: "+str(self.current_match))
+                if self.current_match[2] != None:
+                    recognized_speech = self.current_match[2]
 
     def process_audio(self, recognizer, audio):
         try:

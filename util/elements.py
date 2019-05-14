@@ -421,7 +421,7 @@ class Row(object):
             if "snippet" in self.metadata and self.metadata["snippet"] != "":
                 footer_content = self.metadata["snippet"]
             elif "text" in self.metadata and self.metadata["text"] != "":
-                rendered_row += "<font color='"+text_color+"'>"+self.metadata["text"]+"</font>"
+                footer_content += "<font color='"+text_color+"'>"+self.metadata["text"]+"</font>"
 
             # default footer content
             if footer_content == "":

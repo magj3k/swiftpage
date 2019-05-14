@@ -253,9 +253,9 @@ def break_into_words(word_segment):
 
     return words
 
-def match_any_expression(expressions_to_match, speech, context=None):
+def match_any_expression(expressions_to_match, speech, min_required_variables=0):
     for expr in expressions_to_match:
-        match = match_expression(expr, speech, context)
+        match = match_expression(expr, speech, min_required_variables)
         if match != None:
             return match
     return None
@@ -298,7 +298,7 @@ def extract_numbers(prefix, variables):
 
     return numbers
 
-def match_expression(expression_to_match, speech, context=None): # returns tuple of prefix and variables
+def match_expression(expression_to_match, speech, min_required_variables=0): # returns tuple of prefix and variables
     variables = []
     prefix = speech
     next_phrase = None
@@ -370,6 +370,7 @@ def match_expression(expression_to_match, speech, context=None): # returns tuple
     numbers = extract_numbers(prefix, variables)
     variables += numbers
 
+    if len(variables) < min_required_variables: return None
     return [prefix, variables, next_phrase]
 
 # tests
