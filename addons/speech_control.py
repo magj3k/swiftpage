@@ -21,6 +21,7 @@ class SpeechControlAddon(Addon):
         self.context = {}
         self.reset_context()
         self.current_match = None
+        self.previously_unmatched_phrase = ""
 
     def get_current_page(self):
         return self.modifier.generate()
@@ -40,6 +41,7 @@ class SpeechControlAddon(Addon):
         return False
 
     def process_statement(self, recognized_speech):
+        iteration = 0
         while recognized_speech != None:
             self.current_match = None
             recognized_speech = extract_context(recognized_speech, self.context)
@@ -74,6 +76,15 @@ class SpeechControlAddon(Addon):
                         break
                 self.reset_context()
                 self.queued_modifications.append("remove_navbar "+str(number))
+
+            if self.process_match(["remove section"], recognized_speech):
+                number = 1
+                for variable in self.current_match[1]:
+                    if isinstance(variable, int):
+                        number = variable
+                        break
+                self.reset_context()
+                self.queued_modifications.append("remove_section "+str(number))
 
             if self.process_match(["delete footer"], recognized_speech):
                 self.queued_modifications.append("remove_footer")
@@ -233,6 +244,26 @@ class SpeechControlAddon(Addon):
                 self.queued_modifications.append("add_navbar "+str(index))
                 self.context["object"] = "navbar "+str(index)
 
+            if self.process_match(["add section"], recognized_speech, 1):
+                current_page = self.get_current_page()
+                index = 1
+                proposition = None
+                for variable in self.current_match[1]:
+                    if isinstance(variable, int):
+                        # looks up index of numberth navbar
+                        number = variable
+                        ref = current_page.get_component("section", number)
+                        if ref != None:
+                            index = ref[1]
+                    if proposition == None and (variable in synonyms_dict["above"] or variable in synonyms_dict["before"]):
+                        proposition = "above"
+                    elif proposition == None and (variable in synonyms_dict["below"] or variable in synonyms_dict["after"]):
+                        proposition = "below"
+                if proposition == "below" and len(current_page.sections) > index and isinstance(current_page.sections[index], Section):
+                    index += 1
+                self.queued_modifications.append("add_section "+str(index))
+                self.context["object"] = "section "+str(index)
+
             if self.process_match(["add footer"], recognized_speech):
                 self.queued_modifications.append("add_footer")
                 self.context["object"] = "footer"
@@ -314,11 +345,21 @@ class SpeechControlAddon(Addon):
                 self.context["object"] = "footer"
 
             # processes additional commands
-            recognized_speech = None
             if self.current_match != None:
                 print("Speech interpretation: "+str(self.current_match))
+                recognized_speech = None
+                self.previously_unmatched_phrase = ""
                 if self.current_match[2] != None:
                     recognized_speech = self.current_match[2]
+            else:
+                if self.previously_unmatched_phrase != "" and iteration <= 2:
+                    recognized_speech = self.previously_unmatched_phrase + " " + recognized_speech
+                else:
+                    self.previously_unmatched_phrase = recognized_speech
+                    if self.previously_unmatched_phrase == None: self.previously_unmatched_phrase = ""
+                    recognized_speech = None
+
+            iteration += 1
 
     def process_audio(self, recognizer, audio):
         try:

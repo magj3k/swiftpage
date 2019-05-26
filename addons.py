@@ -159,6 +159,24 @@ class AddonsModifier(object): # loads saved modifications and applies them to cu
                 navbar = self.page.get_component("navbar", number)
                 if navbar != None:
                     self.page.sections = self.page.sections[:navbar[1]]+self.page.sections[navbar[1]+1:]
+            elif "add_section" in mod:
+                index = int(mod[12:])
+                self.page.sections.insert(index, 
+                    Section("Archipelago", "An app project I made once", "archipelago", [
+                        {
+                            "name": "Test Links:",
+                            "type": "links",
+                            "links": [
+                                { "name": "Test Link", "address": "#" }
+                            ]
+                        }
+                    ])
+                )
+            elif "remove_section" in mod:
+                number = int(mod[15:])
+                retrieved_obj = self.page.get_component("section", number)
+                if retrieved_obj != None:
+                    self.page.sections = self.page.sections[:retrieved_obj[1]]+self.page.sections[retrieved_obj[1]+1:]
 
         return self.page
 
