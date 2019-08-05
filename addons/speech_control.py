@@ -78,7 +78,7 @@ class SpeechControlAddon(Addon):
                 self.queued_modifications.append("remove_navbar "+str(number))
 
             if self.process_match(["remove section"], recognized_speech):
-                number = 1
+                number = 1 # TODO, correct number
                 for variable in self.current_match[1]:
                     if isinstance(variable, int):
                         number = variable
@@ -244,9 +244,9 @@ class SpeechControlAddon(Addon):
                 self.queued_modifications.append("add_navbar "+str(index))
                 self.context["object"] = "navbar "+str(index)
 
-            if self.process_match(["add section"], recognized_speech, 1):
+            if self.process_match(["add section"], recognized_speech):
                 current_page = self.get_current_page()
-                index = 1
+                index = len(current_page.sections)-1 # TODO, correct number
                 proposition = None
                 for variable in self.current_match[1]:
                     if isinstance(variable, int):
