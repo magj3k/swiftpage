@@ -1,4 +1,4 @@
-from addon import *
+from .addon import *
 
 class SpeechControlAddon(Addon):
     def __init__(self, page, modifier = None):

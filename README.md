@@ -2,7 +2,7 @@
 
 ## What is SwiftPage?
 
-SwiftPage is a series of Python scripts that let you generate good-looking websites in minutes with no web development experience nor design intuition.  Generated SwiftPages are aesthetically-pleasing, incredibly easy to set up and edit, and mobile-friendly.
+SwiftPage is a series of Python 3 scripts that let you generate good-looking websites in minutes with no web development experience nor design intuition.  Generated SwiftPages are aesthetically-pleasing, incredibly easy to set up and edit, and mobile-friendly.
 
 ## What can I use SwiftPage for?
 
@@ -22,7 +22,7 @@ SwiftPage makes all of these issues pretty much trivial – SwiftPage lets you c
 
 My Website - http://www.magmhj.com
 
-MIT Animation Groups Website - http://mitag.mit.edu
+MIT Animation Group's Website - http://mitag.mit.edu
 
 ## How do I set up SwiftPage and what are its dependencies?
 

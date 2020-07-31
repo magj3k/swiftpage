@@ -1,5 +1,5 @@
 from util.elements import *
-from addons import *
+from addons.addons_server import *
 from page import *
 
 # modifies page through addons

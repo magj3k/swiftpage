@@ -2,7 +2,7 @@ import os
 import time
 import webbrowser
 import threading
-from addons import *
+from addons.addons_server import *
 from page import *
 
 import http.server
@@ -17,6 +17,8 @@ dev_page_prefix = '''
 
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
 <script>
+    var lastRefreshToken = "none";
+
     function loadCommands(filename) {
         $.get(filename, function(data, textStatus) {
             if (textStatus == 'success') {
@@ -24,10 +26,16 @@ dev_page_prefix = '''
 dev_page_middle = '\\'+'r'+'\\'+'n'+'|'+'\\'+'n'+'|'+'\\'+'r'
 dev_page_suffix = ''')|$)/gm)
                 for (var i = 0; i < lines.length; i++) {
-                    if (lines[i] === 'refresh') {
-                        // location.reload(false);
-                        var iframe = document.getElementsByName('content_window')[0];
-                        iframe.contentWindow.location.reload(true);
+                    //console.log(lines[i]); // TODO: remove
+                    if (lines[i] !== '' && lines[i] !== ' ') {
+                        if (lastRefreshToken !== lines[i]) {
+                            lastRefreshToken = lines[i];
+
+                            var iframe = document.getElementsByName('content_window')[0];
+                            iframe.src = iframe.src
+                            iframe.contentWindow.location.reload(true);
+                            //iframe.location.reload(true);
+                        }
                     }
                 }
             } else {
@@ -41,7 +49,7 @@ dev_page_suffix = ''')|$)/gm)
         loadCommands(filename);
     }
 
-    setInterval(checkForCommands, 250);
+    setInterval(checkForCommands, 30);
 </script>
 
 <body style='padding: 0px; margin: 0px;'>
@@ -69,26 +77,29 @@ def main_loop():
 
             # refreshes web browser and writes other commands
             commands = open(".swiftpage_commands","w") 
-            commands.write("refresh")
+            commands.write(str(last_modified_time))
             commands.close() 
         else:
             # empties commands
-            commands = open(".swiftpage_commands","w") 
+            commands = open(".swiftpage_commands","w")
             commands.write("")
             commands.close() 
 
-        time.sleep(0.25)
+        time.sleep(0.6)
 
 def addons_loop():
     global addons_server
     addons_server.on_update()
+
+# removes existing commands file
+os.remove(".swiftpage_commands")
 
 # creates dev_server.html
 dev_server_page = open("dev_server.html","w") 
 dev_server_page.write(dev_page)
 dev_server_page.close() 
 
-# defines custon HTTP handler
+# defines custom HTTP handler
 class customHandler(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         return

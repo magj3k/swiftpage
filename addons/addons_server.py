@@ -1,8 +1,7 @@
-import os, sys
-sys.path.append('./addons')
+import os
 
 # import custom addons here
-from speech_control import *
+from .speech_control import *
 
 class AddonsModifier(object): # loads saved modifications and applies them to current page
     def __init__(self, page):
